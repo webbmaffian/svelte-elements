@@ -12,7 +12,7 @@
 	export let selected = null;
 	export let multiple = false;
 	export let clearable = false;
-	export let dropdownPlaceholder = 'No results';
+	export let dropdownPlaceholder = null;
 	export let itemValue = (item) => {
 		if(typeof item === 'object' && item !== null) {
 			for(const key of itemValueKeys) {
@@ -183,7 +183,9 @@
 			{#each visibleItems.filter(it => !selectedItem(it, selected)) as item}
 				<li on:click={() => selectItem(item)}>{itemLabel(item)}</li>
 			{:else}
-				<li class="dropdown-placeholder">{dropdownPlaceholder}</li>
+				{#if dropdownPlaceholder}
+					<li class="dropdown-placeholder">{dropdownPlaceholder}</li>
+				{/if}
 			{/each}
 		</ul>
 	{/if}
