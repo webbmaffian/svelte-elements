@@ -14,7 +14,7 @@
 	export let clearable = false;
 	export let dropdownPlaceholder = 'No results';
 	export let itemValue = (item) => {
-		if(typeof item === 'object') {
+		if(typeof item === 'object' && item !== null) {
 			for(const key of itemValueKeys) {
 				if(typeof item[key] !== 'undefined') {
 					return item[key];
