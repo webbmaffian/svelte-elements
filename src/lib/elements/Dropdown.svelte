@@ -108,24 +108,31 @@
 				break;
 			case 38:
 				e.preventDefault();
+				if(!open) openDropdown();
 				targetPrevItem();
 				break;
 			case 40:
 				e.preventDefault();
+				if(!open) openDropdown();
 				targetNextItem();
 				break;
 			case 13:
 				e.preventDefault();
-				selectItem(visibleItems[targetIndex % visibleItems.length]);
-				closeDropdown();
-				break;
+				const filteredVisibleItems = visibleItems.filter(it => !selectedItem(it, selected));
+				const selectedTargetItem = filteredVisibleItems[targetIndex % filteredVisibleItems.length];
+				if(selectedTargetItem) {
+					selectItem(selectedTargetItem);
+					closeDropdown();
+					break;
+
+				}
 			default:
 				return;
 		}
 	}
-
 	function targetPrevItem() {
-		if(targetIndex <= 0) return targetItem(visibleItems.length - 1);
+		console.log(targetIndex);
+		if(targetIndex <= 0) return targetItem(visibleItems.filter(it => !selectedItem(it, selected)).length - 1);
 
 		targetItem(targetIndex - 1);
 	}
@@ -221,7 +228,7 @@
 	{#if open}
 		<ul class="dropdown" {style} bind:this={dropdown} on:mousedown|preventDefault on:mousemove={(e) => targetItem(e.target.dataset.index)}>
 			{#each visibleItems.filter(it => !selectedItem(it, selected)) as item, i}
-				<li data-index={i} class:target={i === targetIndex % visibleItems.filter(it => !selectedItem(it, selected)).length} class:current={!multiple && itemValue(item) == itemValue(selected)} on:click={() => selectItem(item)}>{itemLabel(item)}</li>
+				<li class:target={i === targetIndex % visibleItems.filter(it => !selectedItem(it, selected)).length} class:current={!multiple && itemValue(item) == itemValue(selected)} on:click={() => selectItem(item)}>{itemLabel(item)}</li>
 			{:else}
 				{#if dropdownPlaceholder}
 					<li class="dropdown-placeholder">{dropdownPlaceholder}</li>
