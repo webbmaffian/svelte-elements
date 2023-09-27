@@ -12,6 +12,7 @@
 	export let selected = null;
 	export let multiple = false;
 	export let clearable = false;
+	export let dropdownPlaceholder = 'No results';
 	export let itemValue = (item) => {
 		if(typeof item === 'object') {
 			for(const key of itemValueKeys) {
@@ -181,6 +182,8 @@
 		<ul class="dropdown" bind:this={dropdown} {style} on:mousedown|preventDefault>
 			{#each visibleItems.filter(it => !selectedItem(it, selected)) as item}
 				<li on:click={() => selectItem(item)}>{itemLabel(item)}</li>
+			{:else}
+				<li class="dropdown-placeholder">{dropdownPlaceholder}</li>
 			{/each}
 		</ul>
 	{/if}
@@ -223,6 +226,16 @@
 			background: none;
 			border: none;
 			outline: none;
+
+			&::placeholder {
+				user-select: none;
+			}
+		}
+
+		&:not(:only-child) {
+			:global(svg) {
+				rotate: 180deg;
+			}
 		}
 	}
 
@@ -259,8 +272,12 @@
 			padding: 8px;
 			cursor: pointer;
 
-			&:hover {
+			&:not(.dropdown-placeholder):hover {
 				background-color: #E5E7EB;
+			}
+
+			&.dropdown-placeholder {
+				cursor: default;
 			}
 		}
 	}
@@ -271,6 +288,7 @@
 		align-items: center;
 		align-self: stretch;
 		width: 24px;
+		margin-left: auto;
 		background: none;
 		border: none;
 		cursor: pointer;
