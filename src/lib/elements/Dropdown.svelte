@@ -51,6 +51,7 @@
 	let style = '';
 	let searchString = '';
 	let stopAutoUpdate;
+	let targetIndex = -1;
 
 	$: getter = (typeof items === 'function' ? items : arrayGetter(items));
 	$: hasValue = !!(multiple ? selected?.length : selected);
@@ -91,11 +92,50 @@
 
 	function closeDropdown() {
 		open = false;
+		targetIndex = -1;
 
 		if(stopAutoUpdate) {
 			stopAutoUpdate();
 			stopAutoUpdate = null;
 		}
+	}
+
+	function handleKeydown(e) {
+		switch (e.keyCode) {
+			case 27:
+				e.preventDefault();
+				closeDropdown();
+				break;
+			case 38:
+				e.preventDefault();
+				targetPrevItem();
+				break;
+			case 40:
+				e.preventDefault();
+				targetNextItem();
+				break;
+			case 13:
+				e.preventDefault();
+				selectItem(visibleItems[targetIndex % visibleItems.length]);
+				closeDropdown();
+				break;
+			default:
+				return;
+		}
+	}
+
+	function targetPrevItem() {
+		if(targetIndex <= 0) return targetItem(visibleItems.length - 1);
+
+		targetItem(targetIndex - 1);
+	}
+
+	function targetNextItem() {
+		targetItem(targetIndex + 1);
+	}
+
+	function targetItem(index) {
+		targetIndex = index;
 	}
 
 	async function searchItems(e) {
@@ -169,7 +209,7 @@
 			</ul>
 		{/if}
 
-		<input bind:this={input} type="text" {placeholder} value={!multiple && selected ? itemLabel(selected) : ''} on:focus={openDropdown} on:blur={closeDropdown} on:input={searchItems} />
+		<input bind:this={input} type="text" {placeholder} value={!multiple && selected ? itemLabel(selected) : ''} on:keydown={handleKeydown} on:focus={openDropdown} on:blur={closeDropdown} on:input={searchItems} />
 
 		{#if clearable && hasValue}
 			<button on:click={deselectAll}><X size={16} /></button>
@@ -179,9 +219,9 @@
 	</label>
 
 	{#if open}
-		<ul class="dropdown" bind:this={dropdown} {style} on:mousedown|preventDefault>
-			{#each visibleItems.filter(it => !selectedItem(it, selected)) as item}
-				<li on:click={() => selectItem(item)}>{itemLabel(item)}</li>
+		<ul class="dropdown" {style} bind:this={dropdown} on:mousedown|preventDefault on:mousemove={(e) => targetItem(e.target.dataset.index)}>
+			{#each visibleItems.filter(it => !selectedItem(it, selected)) as item, i}
+				<li data-index={i} class:target={i === targetIndex % visibleItems.filter(it => !selectedItem(it, selected)).length} class:current={!multiple && itemValue(item) == itemValue(selected)} on:click={() => selectItem(item)}>{itemLabel(item)}</li>
 			{:else}
 				{#if dropdownPlaceholder}
 					<li class="dropdown-placeholder">{dropdownPlaceholder}</li>
@@ -274,7 +314,11 @@
 			padding: 8px;
 			cursor: pointer;
 
-			&:not(.dropdown-placeholder):hover {
+			&.target {
+				background-color: #f1f2f4;
+			}
+
+			&.current {
 				background-color: #E5E7EB;
 			}
 
