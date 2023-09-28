@@ -57,6 +57,7 @@
 
 	$: getter = (typeof items === 'function' ? items : arrayGetter(items));
 	$: hasValue = !!(multiple ? selected?.length : selected);
+	$: filteredVisibleItems = visibleItems.filter(it => !selectedItem(it, selected));
 
 	/**
 	 * @param {Array} items
@@ -64,6 +65,7 @@
 	function arrayGetter(items) {
 		return (search) => {
 			if(!search) return items;
+			search = search.toLowerCase();
 			return items.filter(item => itemLabel(item).toLowerCase().indexOf(search) !== -1);
 		};
 	}
@@ -120,28 +122,52 @@
 				break;
 			case 13:
 				e.preventDefault();
-				if(visibleItems.length === 0 && searchString) {
+				if((targetIndex === -1 || targetIndex === filteredVisibleItems.length) && !items.find(item => item === searchString)) {
 					createItem(searchString)
-				}
-				const filteredVisibleItems = visibleItems.filter(it => !selectedItem(it, selected));
-				const selectedTargetItem = filteredVisibleItems[targetIndex % filteredVisibleItems.length];
-				if(selectedTargetItem) {
-					selectItem(selectedTargetItem);
-					closeDropdown();
-					break;
+				} else {
+					const selectedTargetItem = filteredVisibleItems[targetIndex];
 
+					if(selectedTargetItem) {
+						selectItem(selectedTargetItem);
+						
+						if(targetIndex >= filteredVisibleItems.length - 1) {
+							targetIndex = 0;
+						}
+					}
 				}
+				break;
+			case 8:
+				if(input.value === '' && Array.isArray(selected)) {
+					deselectItem(selected[selected.length - 1]);
+				}
+				break;
 			default:
 				return;
 		}
 	}
 	function targetPrevItem() {
-		if(targetIndex <= 0) return targetItem(visibleItems.filter(it => !selectedItem(it, selected)).length - 1);
+		if(targetIndex <= 0) {
+			if(creatable && searchString !== '' && !items.find(item => item === searchString)) {
+				return targetItem(filteredVisibleItems.length);
+			}
+
+			return targetItem(filteredVisibleItems.length - 1);
+		}
 
 		targetItem(targetIndex - 1);
 	}
 
 	function targetNextItem() {
+		if(targetIndex === filteredVisibleItems.length - 1) {
+			if(creatable && searchString !== '' && !items.find(item => item === searchString)) {
+				return targetItem(filteredVisibleItems.length);
+			}
+
+		}
+		if(targetIndex >= filteredVisibleItems.length - 1) {
+			return targetItem(0);
+		}
+
 		targetItem(targetIndex + 1);
 	}
 
@@ -152,6 +178,7 @@
 	async function searchItems(e) {
 		searchString = e.target.value.trim();
 		visibleItems = await getter(searchString);
+		openDropdown();
 	}
 
 	function selectItem(item) {
@@ -238,23 +265,23 @@
 		<input bind:this={input} type="text" {placeholder} value={!multiple && selected ? itemLabel(selected) : ''} on:keydown={handleKeydown} on:focus={openDropdown} on:blur={closeDropdown} on:input={searchItems} />
 
 		{#if clearable && hasValue}
-			<button on:click={deselectAll}><X size={16} /></button>
+			<button tabindex="-1" on:click={deselectAll}><X size={16} /></button>
 		{:else}
 			<ChevronDown />
 		{/if}		
 	</label>
 
 	{#if open}
-		<ul class="dropdown" {style} bind:this={dropdown} on:mousedown|preventDefault on:mousemove={(e) => targetItem(e.target.dataset.index)}>
-			{#each visibleItems.filter(it => !selectedItem(it, selected)) as item, i}
-				<li class:target={i === targetIndex % visibleItems.filter(it => !selectedItem(it, selected)).length} class:current={!multiple && itemValue(item) == itemValue(selected)} on:click={() => selectItem(item)}>{itemLabel(item)}</li>
-			{:else}
-				{#if creatable && searchString.trim() !== ''}
-					<li on:click={() => createItem(searchString)}>{`${createPrefix} "${searchString}"`}</li>
-				{:else if dropdownPlaceholder}
-					<li class="dropdown-placeholder">{dropdownPlaceholder}</li>
-				{/if}
+		<ul class="dropdown" {style} bind:this={dropdown} on:mousedown|preventDefault on:mousemove={(e) => targetItem(parseInt(e.target.dataset.index, 10))}>
+			{#each filteredVisibleItems as item, i}
+				<li data-index={i} class:target={i === targetIndex} class:current={!multiple && itemValue(item) == itemValue(selected)} on:click={() => selectItem(item)}>{itemLabel(item)}</li>
 			{/each}
+
+			{#if creatable && searchString !== '' && !items.find(item => item === searchString)}
+				<li data-index={filteredVisibleItems.length} class:target={targetIndex === filteredVisibleItems.length} on:click={() => createItem(searchString)}>{`${createPrefix} "${searchString}"`}</li>
+			{:else if dropdownPlaceholder}
+				<li class="dropdown-placeholder">{dropdownPlaceholder}</li>
+			{/if}
 		</ul>
 	{/if}
 </article>
