@@ -1,1 +1,3 @@
-// Reexport your entry components here
+import Dropdown from '$lib/elements/Dropdown.svelte';
+
+export default { Dropdown };
