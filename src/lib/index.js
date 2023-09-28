@@ -1,3 +1,1 @@
-import Dropdown from '$lib/elements/Dropdown.svelte';
-
-export default { Dropdown };
+export { default as Dropdown } from '$lib/elements/Dropdown.svelte';
