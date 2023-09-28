@@ -72,6 +72,10 @@
 
 	let visibleItems = [];
 
+	function isCreatable() {
+		return creatable && searchString !== '' && !items.find(item => item === searchString);
+	}
+
 	function updatePosition() {
 		computePosition(input, dropdown, {
 			platform,
@@ -122,7 +126,7 @@
 				break;
 			case 13:
 				e.preventDefault();
-				if((targetIndex === -1 || targetIndex === filteredVisibleItems.length) && !items.find(item => item === searchString)) {
+				if((targetIndex === -1 || targetIndex === filteredVisibleItems.length) && isCreatable()) {
 					createItem(searchString)
 				} else {
 					const selectedTargetItem = filteredVisibleItems[targetIndex];
@@ -147,7 +151,7 @@
 	}
 	function targetPrevItem() {
 		if(targetIndex <= 0) {
-			if(creatable && searchString !== '' && !items.find(item => item === searchString)) {
+			if(isCreatable()) {
 				return targetItem(filteredVisibleItems.length);
 			}
 
@@ -159,12 +163,12 @@
 
 	function targetNextItem() {
 		if(targetIndex === filteredVisibleItems.length - 1) {
-			if(creatable && searchString !== '' && !items.find(item => item === searchString)) {
+			if(isCreatable()) {
 				return targetItem(filteredVisibleItems.length);
 			}
 
 		}
-		if(targetIndex >= filteredVisibleItems.length - 1) {
+		if(targetIndex > filteredVisibleItems.length - 1) {
 			return targetItem(0);
 		}
 
@@ -277,7 +281,7 @@
 				<li data-index={i} class:target={i === targetIndex} class:current={!multiple && itemValue(item) == itemValue(selected)} on:click={() => selectItem(item)}>{itemLabel(item)}</li>
 			{/each}
 
-			{#if creatable && searchString !== '' && !items.find(item => item === searchString)}
+			{#if isCreatable()}
 				<li data-index={filteredVisibleItems.length} class:target={targetIndex === filteredVisibleItems.length} on:click={() => createItem(searchString)}>{`${createPrefix} "${searchString}"`}</li>
 			{:else if dropdownPlaceholder}
 				<li class="dropdown-placeholder">{dropdownPlaceholder}</li>
