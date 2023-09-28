@@ -57,8 +57,7 @@
 
 	$: getter = (typeof items === 'function' ? items : arrayGetter(items));
 	$: hasValue = !!(multiple ? selected?.length : selected);
-	$: filteredVisibleItems = visibleItems.filter(it => !selectedItem(it, selected));
-
+	
 	/**
 	 * @param {Array} items
 	 */
@@ -69,14 +68,16 @@
 			return items.filter(item => itemLabel(item).toLowerCase().indexOf(search) !== -1);
 		};
 	}
-
+	
 	let visibleItems = [];
+	$: filteredVisibleItems = visibleItems.filter(it => !selectedItem(it, selected));
 
 	function isCreatable() {
 		return creatable && searchString !== '' && !items.find(item => item === searchString);
 	}
 
 	function updatePosition() {
+		if(!input || !dropdown) return;
 		computePosition(input, dropdown, {
 			platform,
 			placement: 'bottom-start',
