@@ -12,6 +12,8 @@
 	export let selected = null;
 	export let multiple = false;
 	export let clearable = false;
+	export let creatable = false;
+	export let createPrefix = 'Create';
 	export let dropdownPlaceholder = null;
 	export let itemValue = (item) => {
 		if(typeof item === 'object' && item !== null) {
@@ -87,7 +89,7 @@
 		open = true;
 		await tick();
 		stopAutoUpdate = autoUpdate(wrapper, dropdown, updatePosition);
-		visibleItems = await getter();
+		visibleItems = await getter(searchString);
 	}
 
 	function closeDropdown() {
@@ -118,6 +120,9 @@
 				break;
 			case 13:
 				e.preventDefault();
+				if(visibleItems.length === 0 && searchString) {
+					createItem(searchString)
+				}
 				const filteredVisibleItems = visibleItems.filter(it => !selectedItem(it, selected));
 				const selectedTargetItem = filteredVisibleItems[targetIndex % filteredVisibleItems.length];
 				if(selectedTargetItem) {
@@ -131,7 +136,6 @@
 		}
 	}
 	function targetPrevItem() {
-		console.log(targetIndex);
 		if(targetIndex <= 0) return targetItem(visibleItems.filter(it => !selectedItem(it, selected)).length - 1);
 
 		targetItem(targetIndex - 1);
@@ -168,7 +172,7 @@
 
 	function deselectItem(item) {
 		if(!multiple || !Array.isArray(selected)) return;
-
+		
 		const value = itemValue(item);
 		const idx = selected.findIndex(it => itemValue(it) === value);
 
@@ -191,6 +195,21 @@
 		let value = itemValue(item);
 
 		return selected.find(it => itemValue(it) === value);
+	}
+
+	async function createItem(newItem) {
+		if(typeof newItem !== "string" || newItem?.trim() === '') return;
+		for(const item of items) {
+			if (typeof item !== "string") return;
+		}
+
+		items.push(newItem);
+		items = items;
+		searchString = '';
+		input.value = '';
+		visibleItems = await getter();
+
+		selectItem(newItem);
 	}
 
 	function dispatchChange() {
@@ -230,7 +249,9 @@
 			{#each visibleItems.filter(it => !selectedItem(it, selected)) as item, i}
 				<li class:target={i === targetIndex % visibleItems.filter(it => !selectedItem(it, selected)).length} class:current={!multiple && itemValue(item) == itemValue(selected)} on:click={() => selectItem(item)}>{itemLabel(item)}</li>
 			{:else}
-				{#if dropdownPlaceholder}
+				{#if creatable && searchString.trim() !== ''}
+					<li on:click={() => createItem(searchString)}>{`${createPrefix} "${searchString}"`}</li>
+				{:else if dropdownPlaceholder}
 					<li class="dropdown-placeholder">{dropdownPlaceholder}</li>
 				{/if}
 			{/each}
