@@ -1,6 +1,10 @@
 {
 	"name": "@webbmaffian/svelte-elements",
 	"version": "0.0.1",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/webbmaffian/svelte-elements.git"
+	},
 	"scripts": {
 		"dev": "vite dev",
 		"build": "vite build && npm run package",
