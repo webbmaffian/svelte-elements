@@ -1,6 +1,6 @@
 {
 	"name": "@webbmaffian/svelte-elements",
-	"version": "0.0.2",
+	"version": "0.0.3",
 	"repository": {
 		"type": "git",
 		"url": "git+https://github.com/webbmaffian/svelte-elements.git"
@@ -32,7 +32,6 @@
 		"@sveltejs/adapter-auto": "^2.0.0",
 		"@sveltejs/kit": "^1.20.4",
 		"@sveltejs/package": "^2.0.0",
-		"lucide-svelte": "^0.279.0",
 		"publint": "^0.1.9",
 		"sass": "^1.68.0",
 		"svelte": "^4.0.5",
@@ -46,6 +45,7 @@
 	"types": "./dist/index.d.ts",
 	"type": "module",
 	"dependencies": {
-		"@floating-ui/dom": "^1.5.3"
+		"@floating-ui/dom": "^1.5.3",
+		"lucide-svelte": "^0.279.0"
 	}
 }
