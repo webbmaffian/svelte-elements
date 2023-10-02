@@ -12,15 +12,12 @@
 	export let selected = null;
 	export let multiple = false;
 	export let clearable = false;
-<<<<<<< Updated upstream
-=======
 	export let creatable = false;
 	export let disabled = false;
 	export let createPrefix = 'Create';
 	export let dropdownPlaceholder = null;
->>>>>>> Stashed changes
 	export let itemValue = (item) => {
-		if(typeof item === 'object') {
+		if(typeof item === 'object' && item !== null) {
 			for(const key of itemValueKeys) {
 				if(typeof item[key] !== 'undefined') {
 					return item[key];
@@ -57,28 +54,32 @@
 	let style = '';
 	let searchString = '';
 	let stopAutoUpdate;
+	let targetIndex = -1;
 
 	$: getter = (typeof items === 'function' ? items : arrayGetter(items));
 	$: hasValue = !!(multiple ? selected?.length : selected);
-
+	
 	/**
 	 * @param {Array} items
 	 */
 	function arrayGetter(items) {
 		return (search) => {
 			if(!search) return items;
-<<<<<<< Updated upstream
-			return items.filter(item => itemLabel(item).toLowerCase().indexOf(search) !== -1);
-=======
+
 			search = search.toLowerCase();
 			return items.filter(item => itemLabel(item, items).toLowerCase().indexOf(search) !== -1);
->>>>>>> Stashed changes
 		};
 	}
-
+	
 	let visibleItems = [];
+	$: filteredVisibleItems = visibleItems.filter(it => !selectedItem(it, selected));
+
+	function isCreatable() {
+		return creatable && searchString !== '' && !items.find(item => item === searchString);
+	}
 
 	function updatePosition() {
+		if(!input || !dropdown) return;
 		computePosition(input, dropdown, {
 			platform,
 			placement: 'bottom-start',
@@ -97,11 +98,12 @@
 		open = true;
 		await tick();
 		stopAutoUpdate = autoUpdate(wrapper, dropdown, updatePosition);
-		visibleItems = await getter();
+		visibleItems = await getter(searchString);
 	}
 
 	function closeDropdown() {
 		open = false;
+		targetIndex = -1;
 
 		if(stopAutoUpdate) {
 			stopAutoUpdate();
@@ -109,8 +111,6 @@
 		}
 	}
 
-<<<<<<< Updated upstream
-=======
 	function handleKeydown(e) {
 		switch (e.keyCode) {
 			case 27:
@@ -183,10 +183,10 @@
 		dropdown.scrollTo({top: dropdown.children[index].offsetTop - dropdown.offsetTop});
 	}
 
->>>>>>> Stashed changes
 	async function searchItems(e) {
 		searchString = e.target.value.trim();
 		visibleItems = await getter(searchString);
+		openDropdown();
 	}
 
 	function selectItem(item) {
@@ -207,7 +207,7 @@
 
 	function deselectItem(item) {
 		if(!multiple || !Array.isArray(selected)) return;
-
+		
 		const value = itemValue(item);
 		const idx = selected.findIndex(it => itemValue(it) === value);
 
@@ -230,6 +230,21 @@
 		let value = itemValue(item);
 
 		return selected.find(it => itemValue(it) === value);
+	}
+
+	async function createItem(newItem) {
+		if(typeof newItem !== "string" || newItem?.trim() === '') return;
+		for(const item of items) {
+			if (typeof item !== "string") return;
+		}
+
+		items.push(newItem);
+		items = items;
+		searchString = '';
+		input.value = '';
+		visibleItems = await getter();
+
+		selectItem(newItem);
 	}
 
 	function dispatchChange() {
@@ -255,26 +270,16 @@
 			</ul>
 		{/if}
 
-<<<<<<< Updated upstream
-		<input bind:this={input} type="text" {placeholder} value={!multiple && selected ? itemLabel(selected) : ''} on:focus={openDropdown} on:blur={closeDropdown} on:input={searchItems} />
-=======
 		<input bind:this={input} type="text" {placeholder} value={!multiple && selected ? itemLabel(selected, items) : ''} on:keydown={handleKeydown} on:focus={openDropdown} on:blur={closeDropdown} on:input={searchItems} disabled={disabled} />
->>>>>>> Stashed changes
 
 		{#if clearable && hasValue}
-			<button on:click={deselectAll}><X size={16} /></button>
+			<button tabindex="-1" on:click={deselectAll}><X size={16} /></button>
 		{:else}
 			<ChevronDown />
 		{/if}		
 	</label>
 
 	{#if open}
-<<<<<<< Updated upstream
-		<ul class="dropdown" bind:this={dropdown} {style} on:mousedown|preventDefault>
-			{#each visibleItems.filter(it => !selectedItem(it, selected)) as item}
-				<li on:click={() => selectItem(item)}>{itemLabel(item)}</li>
-			{/each}
-=======
 		<ul class="dropdown" {style} bind:this={dropdown} on:mousedown|preventDefault on:mousemove={(e) => targetItem(parseInt(e.target.dataset.index, 10))}>
 			{#each filteredVisibleItems as item, i}
 				<li data-index={i} class:target={i === targetIndex} class:current={!multiple && itemValue(item) == itemValue(selected)} on:click={() => selectItem(item)}>{itemLabel(item, items)}</li>
@@ -285,7 +290,6 @@
 			{:else if dropdownPlaceholder && filteredVisibleItems.length === 0}
 				<li class="dropdown-placeholder">{dropdownPlaceholder}</li>
 			{/if}
->>>>>>> Stashed changes
 		</ul>
 	{/if}
 </article>
@@ -332,6 +336,16 @@
 			background: none;
 			border: none;
 			outline: none;
+
+			&::placeholder {
+				user-select: none;
+			}
+		}
+
+		&:not(:only-child) {
+			:global(svg) {
+				rotate: 180deg;
+			}
 		}
 	}
 
@@ -368,8 +382,16 @@
 			padding: 8px;
 			cursor: pointer;
 
-			&:hover {
+			&.target {
+				background-color: #f1f2f4;
+			}
+
+			&.current {
 				background-color: #E5E7EB;
+			}
+
+			&.dropdown-placeholder {
+				cursor: default;
 			}
 		}
 	}
@@ -380,6 +402,7 @@
 		align-items: center;
 		align-self: stretch;
 		width: 24px;
+		margin-left: auto;
 		background: none;
 		border: none;
 		cursor: pointer;
