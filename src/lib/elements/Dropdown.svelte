@@ -1,5 +1,5 @@
 <script>
-	import { computePosition, platform, flip, autoUpdate } from '@floating-ui/dom';
+	import { computePosition, platform, flip, autoUpdate, offset } from '@floating-ui/dom';
     import { createEventDispatcher, tick } from 'svelte';
 	import { ChevronDown, X } from 'lucide-svelte';
 
@@ -15,7 +15,7 @@
 	export let creatable = false;
 	export let disabled = false;
 	export let classes = '';
-	export let dropdownGap = 0;
+	export let dropdownGap = 20;
 	export let createPrefix = 'Create';
 	export let dropdownPlaceholder = null;
 	export let itemValue = (item) => {
@@ -83,13 +83,14 @@
 			platform,
 			placement: 'bottom-start',
 			middleware: [
+				offset(dropdownGap),
 				flip({
 					crossAxis: false,
 					padding: 16
 				})
 			]
 		}).then(({y}) => {
-			style = `top: ${y + dropdownGap}px;`;
+			style = `top: ${y}px;`;
 		});
 	}
 
