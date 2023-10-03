@@ -14,6 +14,7 @@
 	export let clearable = false;
 	export let creatable = false;
 	export let disabled = false;
+	export let classes = '';
 	export let createPrefix = 'Create';
 	export let dropdownPlaceholder = null;
 	export let itemValue = (item) => {
@@ -260,7 +261,7 @@
 	}
 </script>
 
-<article class="svelte-elements-dropdown" bind:this={wrapper} class:disabled={disabled}>
+<article class={`svelte-elements-dropdown ${classes}`} bind:this={wrapper} class:disabled={disabled}>
 	<label class="input">
 		{#if multiple && Array.isArray(selected)}
 			<ul class="selected" on:mousedown|preventDefault>
