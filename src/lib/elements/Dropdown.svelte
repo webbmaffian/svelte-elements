@@ -122,11 +122,13 @@
 				e.preventDefault();
 				if(!open) openDropdown();
 				targetPrevItem();
+				if(dropdown?.children) dropdown.scrollTo({top: dropdown.children[targetIndex]?.offsetTop - dropdown?.offsetTop});
 				break;
 			case 40:
 				e.preventDefault();
 				if(!open) openDropdown();
 				targetNextItem();
+				if(dropdown?.children) dropdown.scrollTo({top: dropdown.children[targetIndex]?.offsetTop - dropdown?.offsetTop});
 				break;
 			case 13:
 				e.preventDefault();
@@ -172,7 +174,8 @@
 			}
 
 		}
-		if(targetIndex > filteredVisibleItems.length - 1) {
+		
+		if(targetIndex >= filteredVisibleItems.length - 1) {
 			return targetItem(0);
 		}
 
@@ -181,7 +184,6 @@
 
 	function targetItem(index) {
 		targetIndex = index;
-		dropdown.scrollTo({top: dropdown.children[index].offsetTop - dropdown.offsetTop});
 	}
 
 	async function searchItems(e) {
