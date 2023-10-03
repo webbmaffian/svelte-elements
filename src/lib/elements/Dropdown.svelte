@@ -263,7 +263,7 @@
 	}
 </script>
 
-<article class={`svelte-elements-dropdown ${classes}`} bind:this={wrapper} class:disabled={disabled}>
+<article class={`svelte-elements-dropdown ${classes}`} bind:this={wrapper} class:disabled>
 	<label class="input">
 		{#if multiple && Array.isArray(selected)}
 			<ul class="selected" on:mousedown|preventDefault>
@@ -273,7 +273,7 @@
 			</ul>
 		{/if}
 
-		<input bind:this={input} type="text" {placeholder} value={!multiple && selected ? itemLabel(selected, items) : ''} on:keydown={handleKeydown} on:focus={openDropdown} on:blur={closeDropdown} on:input={searchItems} disabled={disabled} />
+		<input bind:this={input} type="text" {placeholder} value={!multiple && selected ? itemLabel(selected, items) : ''} on:keydown={handleKeydown} on:focus={openDropdown} on:blur={closeDropdown} on:input={searchItems} {disabled} />
 
 		{#if clearable && hasValue}
 			<button tabindex="-1" on:click={deselectAll}><X size={16} /></button>
