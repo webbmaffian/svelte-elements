@@ -15,6 +15,7 @@
 	export let creatable = false;
 	export let disabled = false;
 	export let classes = '';
+	export let dropdownGap = 0;
 	export let createPrefix = 'Create';
 	export let dropdownPlaceholder = null;
 	export let itemValue = (item) => {
@@ -88,7 +89,7 @@
 				})
 			]
 		}).then(({y}) => {
-			style = `top: ${y}px;`;
+			style = `top: ${y + dropdownGap}px;`;
 		});
 	}
 
