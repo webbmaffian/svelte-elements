@@ -136,7 +136,7 @@
 					createItem(searchString)
 				} else {
 					const selectedTargetItem = filteredVisibleItems[targetIndex];
-
+					
 					if(selectedTargetItem) {
 						selectItem(selectedTargetItem);
 						
@@ -172,7 +172,7 @@
 			if(isCreatable()) {
 				return targetItem(filteredVisibleItems.length);
 			}
-
+			
 		}
 		
 		if(targetIndex >= filteredVisibleItems.length - 1) {
@@ -285,7 +285,15 @@
 	{#if open}
 		<ul class="dropdown" {style} bind:this={dropdown} on:mousedown|preventDefault on:mousemove={(e) => targetItem(parseInt(e.target.dataset.index, 10))}>
 			{#each filteredVisibleItems as item, i}
-				<li data-index={i} class:target={i === targetIndex} class:current={!multiple && itemValue(item) == itemValue(selected)} on:click={() => selectItem(item)}>{itemLabel(item, items)}</li>
+				<li 
+					data-index={i} 
+					class:target={i === targetIndex} 
+					class:current={!multiple && itemValue(item) == itemValue(selected)} 
+					class:highlighted={item?.highlighted} 
+					on:click={() => selectItem(item)}
+				>
+					{itemLabel(item, items)}
+				</li>
 			{/each}
 
 			{#if isCreatable()}
