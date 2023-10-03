@@ -75,6 +75,7 @@
 	
 	let visibleItems = [];
 	$: filteredVisibleItems = visibleItems.filter(it => !selectedItem(it, selected));
+	$: dropdownActivatable = open && (filteredVisibleItems.length !== 0 || dropdownPlaceholder);
 	$: isCreatable = creatable && searchString !== '' && !items.find(item => item === searchString);
 
 	function updatePosition() {
@@ -282,7 +283,7 @@
 	</label>
 
 	{#if open}
-		<ul class="dropdown" {style} bind:this={dropdown} on:mousedown|preventDefault on:mousemove={(e) => {if(e.target.tagName === 'LI') targetItem(parseInt(e.target.dataset.index, 10))}}>
+		<ul class="dropdown" class:open={dropdownActivatable} {style} bind:this={dropdown} on:mousedown|preventDefault on:mousemove={(e) => {if(e.target.tagName === 'LI') targetItem(parseInt(e.target.dataset.index, 10))}}>
 			{#each filteredVisibleItems as item, i}
 				<li 
 					data-index={i} 
