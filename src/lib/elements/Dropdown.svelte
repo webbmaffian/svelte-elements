@@ -120,13 +120,13 @@
 				e.preventDefault();
 				if(!open) openDropdown();
 				targetPrevItem();
-				if(dropdown?.children) dropdown.scrollTo({top: dropdown.children[targetIndex]?.offsetTop - dropdown?.offsetTop});
+				if(dropdown?.children) dropdown.scrollTo(0, dropdown.children[targetIndex]?.offsetTop);
 				break;
 			case 40:
 				e.preventDefault();
 				if(!open) openDropdown();
 				targetNextItem();
-				if(dropdown?.children) dropdown.scrollTo({top: dropdown.children[targetIndex]?.offsetTop - dropdown?.offsetTop});
+				if(dropdown?.children) dropdown.scrollTo(0, dropdown.children[targetIndex]?.offsetTop);
 				break;
 			case 13:
 				e.preventDefault();
@@ -281,7 +281,7 @@
 	</label>
 
 	{#if open}
-		<ul class="dropdown" {style} bind:this={dropdown} on:mousedown|preventDefault on:mousemove={(e) => targetItem(parseInt(e.target.dataset.index, 10))}>
+		<ul class="dropdown" {style} bind:this={dropdown} on:mousedown|preventDefault on:mousemove={(e) => {if(e.target.tagName === 'LI') targetItem(parseInt(e.target.dataset.index, 10))}}>
 			{#each filteredVisibleItems as item, i}
 				<li 
 					data-index={i} 
