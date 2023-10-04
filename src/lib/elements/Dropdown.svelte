@@ -275,7 +275,19 @@
 			</ul>
 		{/if}
 
-		<input bind:this={input} type="text" {placeholder} value={!multiple && selected ? itemLabel(selected, items) : ''} on:keydown={handleKeydown} on:focus={openDropdown} on:blur={closeDropdown} on:input={searchItems} {required} {disabled} />
+		<input
+			bind:this={input}
+			type="text"
+			autocomplete="off"
+			{placeholder}
+			value={!multiple && selected ? itemLabel(selected, items) : ''}
+			on:keydown={handleKeydown}
+			on:focus={openDropdown}
+			on:blur={closeDropdown}
+			on:input={searchItems}
+			{required}
+			{disabled}
+		/>
 
 		{#if clearable && hasValue}
 			<button tabindex="-1" on:click={deselectAll}><X size={16} /></button>
