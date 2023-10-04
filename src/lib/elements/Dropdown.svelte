@@ -265,7 +265,7 @@
 	}
 </script>
 
-<article class={`svelte-elements-dropdown ${classes}`} bind:this={wrapper} class:disabled {id}>
+<article class={`svelte-elements-dropdown ${classes}`} bind:this={wrapper} class:disabled>
 	<label class="input">
 		{#if multiple && Array.isArray(selected)}
 			<ul class="selected" on:mousedown|preventDefault>
@@ -287,6 +287,7 @@
 			on:input={searchItems}
 			{required}
 			{disabled}
+			{id}
 		/>
 
 		{#if clearable && hasValue}
