@@ -15,6 +15,7 @@
 	export let clearable = false;
 	export let creatable = false;
 	export let disabled = false;
+	export let required = false;
 	export let classes = '';
 	export let dropdownGap = 20;
 	export let createPrefix = 'Create';
@@ -274,7 +275,7 @@
 			</ul>
 		{/if}
 
-		<input bind:this={input} type="text" {placeholder} value={!multiple && selected ? itemLabel(selected, items) : ''} on:keydown={handleKeydown} on:focus={openDropdown} on:blur={closeDropdown} on:input={searchItems} {disabled} />
+		<input bind:this={input} type="text" {placeholder} value={!multiple && selected ? itemLabel(selected, items) : ''} on:keydown={handleKeydown} on:focus={openDropdown} on:blur={closeDropdown} on:input={searchItems} {required} {disabled} />
 
 		{#if clearable && hasValue}
 			<button tabindex="-1" on:click={deselectAll}><X size={16} /></button>
