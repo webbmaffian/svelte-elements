@@ -7,6 +7,7 @@
 	const itemValueKeys = ['id', 'value'];
 	const itemLabelKeys = ['label', 'name', 'value'];
 
+	export let id = null;
 	export let placeholder = '';
 	export let items = [];
 	export let selected = null;
@@ -263,7 +264,7 @@
 	}
 </script>
 
-<article class={`svelte-elements-dropdown ${classes}`} bind:this={wrapper} class:disabled>
+<article class={`svelte-elements-dropdown ${classes}`} bind:this={wrapper} class:disabled {id}>
 	<label class="input">
 		{#if multiple && Array.isArray(selected)}
 			<ul class="selected" on:mousedown|preventDefault>
