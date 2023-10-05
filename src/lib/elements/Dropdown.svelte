@@ -10,7 +10,7 @@
 	export let id = null;
 	export let placeholder = '';
 	export let items = [];
-	export let selected = null;
+	export let value = null;
 	export let multiple = false;
 	export let clearable = false;
 	export let creatable = false;
@@ -20,6 +20,11 @@
 	export let dropdownGap = 20;
 	export let createPrefix = 'Create';
 	export let dropdownPlaceholder = null;
+
+	/**
+	 * Takes an item and returns its value.
+	 * @param item
+	 */
 	export let itemValue = (item) => {
 		if(typeof item === 'object' && item !== null) {
 			for(const key of itemValueKeys) {
@@ -31,6 +36,12 @@
 
 		return item;
 	};
+
+	/**
+	 * Takes an item and returns its label.
+	 * @param item
+	 * @param allItems
+	 */
 	export let itemLabel = (item, allItems = items) => {
 		if(typeof item === 'object') {
 			for(const key of itemLabelKeys) {
@@ -51,6 +62,14 @@
 		return item;
 	};
 
+	/**
+	 * Takes value(s) and return the corresponding id-label object.
+	 * @param value
+	 */
+	export let resolveSelectedItems = (value) => {
+		return value
+	};
+
 	let wrapper;
 	let input;
 	let dropdown;
@@ -59,6 +78,14 @@
 	let searchString = '';
 	let stopAutoUpdate;
 	let targetIndex = -1;
+	let selected = null;
+
+	// Only run one time
+	(async (value) => {
+		if(value) {
+			selected = await resolveSelectedItems(value);
+		}
+	})(value);
 
 	$: getter = (typeof items === 'function' ? items : arrayGetter(items));
 	$: hasValue = !!(multiple ? selected?.length : selected);
@@ -68,7 +95,7 @@
 	 */
 	function arrayGetter(items) {
 		return (search) => {
-			if(!search) return items;
+			if(!search || !items) return items;
 
 			search = search.toLowerCase();
 			return items.filter(item => itemLabel(item, items).toLowerCase().indexOf(search) !== -1);

@@ -49,6 +49,11 @@
 	function outputEventData(e) {
 		result = JSON.stringify(e.detail, null, 2);
 	}
+
+	async function resolveSelectedItems(values) {
+		const items = await items3();
+		return values.map(item => items.find(it => it.id === item) || item);
+	}
 </script>
 
 <div />
@@ -58,7 +63,7 @@
 <Dropdown
 	placeholder="Select something"
 	items={items1}
-	selected={['Kungsgatan 60']}
+	value={['Kungsgatan 60']}
 	multiple
 	clearable
 	on:change={outputEventData}
@@ -69,7 +74,7 @@
 <Dropdown
 	placeholder="Select something"
 	items={items2}
-	selected={['k60']}
+	value={['k60']}
 	multiple
 	clearable
 	on:change={outputEventData}
@@ -80,7 +85,8 @@
 <Dropdown
 	placeholder="Select something"
 	items={items3}
-	selected={['k60']}
+	{resolveSelectedItems}
+	value={['k60']}
 	multiple
 	clearable
 	on:change={outputEventData}
