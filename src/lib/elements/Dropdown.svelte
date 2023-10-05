@@ -80,13 +80,11 @@
 	let targetIndex = -1;
 	let visibleSelected = null;
 
-	// Only run one time
+	// Run every time `selected` changes
 	$: updateVisibleSelected(selected);
 
 	async function updateVisibleSelected(selected) {
-		if(selected) {
-			visibleSelected = await resolveSelectedItems(selected);
-		}
+		visibleSelected = await resolveSelectedItems(selected);
 	}
 
 	$: getter = (typeof items === 'function' ? items : arrayGetter(items));
