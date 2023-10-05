@@ -104,7 +104,7 @@
 	
 	let visibleItems = [];
 	$: filteredVisibleItems = visibleItems.filter(it => !selectedItem(it, visibleSelected));
-	$: dropdownActivatable = open && (filteredVisibleItems.length !== 0 || dropdownPlaceholder);
+	$: dropdownActivatable = open && (filteredVisibleItems.length !== 0 || dropdownPlaceholder || creatable);
 	$: isCreatable = creatable && searchString !== '' && !items.find(item => item === searchString);
 
 	function updatePosition() {
