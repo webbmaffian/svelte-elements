@@ -63,7 +63,7 @@
 <Dropdown
 	placeholder="Select something"
 	items={items1}
-	value={['Kungsgatan 60']}
+	selected={['Kungsgatan 60']}
 	multiple
 	clearable
 	on:change={outputEventData}
@@ -74,7 +74,7 @@
 <Dropdown
 	placeholder="Select something"
 	items={items2}
-	value={['k60']}
+	selected={['k60']}
 	multiple
 	clearable
 	on:change={outputEventData}
@@ -86,7 +86,7 @@
 	placeholder="Select something"
 	items={items3}
 	{resolveSelectedItems}
-	value={['k60']}
+	selected={['k60', 'k37']}
 	multiple
 	clearable
 	on:change={outputEventData}

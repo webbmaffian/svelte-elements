@@ -10,7 +10,7 @@
 	export let id = null;
 	export let placeholder = '';
 	export let items = [];
-	export let value = null;
+	export let selected = null;
 	export let multiple = false;
 	export let clearable = false;
 	export let creatable = false;
@@ -78,17 +78,19 @@
 	let searchString = '';
 	let stopAutoUpdate;
 	let targetIndex = -1;
-	let selected = null;
+	let visibleSelected = null;
 
 	// Only run one time
-	(async (value) => {
-		if(value) {
-			selected = await resolveSelectedItems(value);
+	$: updateVisibleSelected(selected);
+
+	async function updateVisibleSelected(selected) {
+		if(selected) {
+			visibleSelected = await resolveSelectedItems(selected);
 		}
-	})(value);
+	}
 
 	$: getter = (typeof items === 'function' ? items : arrayGetter(items));
-	$: hasValue = !!(multiple ? selected?.length : selected);
+	$: hasValue = !!(multiple ? visibleSelected?.length : visibleSelected);
 	
 	/**
 	 * @param {Array} items
@@ -103,7 +105,7 @@
 	}
 	
 	let visibleItems = [];
-	$: filteredVisibleItems = visibleItems.filter(it => !selectedItem(it, selected));
+	$: filteredVisibleItems = visibleItems.filter(it => !selectedItem(it, visibleSelected));
 	$: dropdownActivatable = open && (filteredVisibleItems.length !== 0 || dropdownPlaceholder);
 	$: isCreatable = creatable && searchString !== '' && !items.find(item => item === searchString);
 
@@ -176,8 +178,8 @@
 				}
 				break;
 			case 8:
-				if(input.value === '' && Array.isArray(selected)) {
-					deselectItem(selected[selected.length - 1]);
+				if(input.value === '' && Array.isArray(visibleSelected)) {
+					deselectItem(visibleSelected[visibleSelected.length - 1]);
 				}
 				break;
 			default:
@@ -223,14 +225,14 @@
 
 	function selectItem(item) {
 		if(multiple) {
-			if(!Array.isArray(selected)) {
-				selected = [item];
-			} else if(!selectedItem(item, selected)) {
-				selected.push(item);
-				selected = selected;
+			if(!Array.isArray(visibleSelected)) {
+				visibleSelected = [item];
+			} else if(!selectedItem(item, visibleSelected)) {
+				visibleSelected.push(item);
+				visibleSelected = visibleSelected;
 			}
 		} else {
-			selected = item;
+			visibleSelected = item;
 			input.blur();
 		}
 
@@ -238,30 +240,30 @@
 	}
 
 	function deselectItem(item) {
-		if(!multiple || !Array.isArray(selected)) return;
+		if(!multiple || !Array.isArray(visibleSelected)) return;
 		
 		const value = itemValue(item);
-		const idx = selected.findIndex(it => itemValue(it) === value);
+		const idx = visibleSelected.findIndex(it => itemValue(it) === value);
 
 		if(idx !== -1) {
-			selected.splice(idx, 1);
-			selected = selected;
+			visibleSelected.splice(idx, 1);
+			visibleSelected = visibleSelected;
 		}
 
 		dispatchChange();
 	}
 
 	function deselectAll() {
-		selected = (multiple ? [] : null);
+		visibleSelected = (multiple ? [] : null);
 		dispatchChange();
 	}
 
-	function selectedItem(item, selected) {
-		if(!Array.isArray(selected)) return false;
+	function selectedItem(item, visibleSelected) {
+		if(!Array.isArray(visibleSelected)) return false;
 		
 		let value = itemValue(item);
 
-		return selected.find(it => itemValue(it) === value);
+		return visibleSelected.find(it => itemValue(it) === value);
 	}
 
 	async function createItem(newItem) {
@@ -282,21 +284,21 @@
 	function dispatchChange() {
 		if(Array.isArray(items)) {
 			if(multiple) {
-				dispatch('change', (selected || []).map(itemValue));
+				dispatch('change', (visibleSelected || []).map(itemValue));
 			} else {
-				dispatch('change', selected ? itemValue(selected) : null);
+				dispatch('change', visibleSelected ? itemValue(visibleSelected) : null);
 			}
 		} else {
-			dispatch('change', selected || (multiple ? [] : null));
+			dispatch('change', visibleSelected || (multiple ? [] : null));
 		}
 	}
 </script>
 
 <article class={`svelte-elements-dropdown ${classes}`} bind:this={wrapper} class:disabled>
 	<label class="input">
-		{#if multiple && Array.isArray(selected)}
+		{#if multiple && Array.isArray(visibleSelected)}
 			<ul class="selected" on:mousedown|preventDefault>
-				{#each selected as item}
+				{#each visibleSelected as item}
 					<li on:click={() => deselectItem(item)}>{itemLabel(item, items)}<X size={16} /></li>
 				{/each}
 			</ul>
@@ -307,7 +309,7 @@
 			type="text"
 			autocomplete="off"
 			{placeholder}
-			value={!multiple && selected ? itemLabel(selected, items) : ''}
+			value={!multiple && visibleSelected ? itemLabel(visibleSelected, items) : ''}
 			on:keydown={handleKeydown}
 			on:focus={openDropdown}
 			on:blur={closeDropdown}
@@ -330,7 +332,7 @@
 				<li 
 					data-index={i} 
 					class:target={i === targetIndex} 
-					class:current={!multiple && itemValue(item) == itemValue(selected)} 
+					class:current={!multiple && itemValue(item) == itemValue(visibleSelected)} 
 					class:highlighted={item?.highlighted} 
 					on:click={() => selectItem(item)}
 				>
