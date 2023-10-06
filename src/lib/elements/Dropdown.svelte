@@ -112,8 +112,8 @@
 	$: isCreatable = creatable && searchString !== '' && !items.find(item => item === searchString);
 
 	function updatePosition() {
-		if(!input || !dropdown) return;
-		computePosition(input, dropdown, {
+		if(!wrapper || !input || !dropdown) return;
+		computePosition(wrapper, dropdown, {
 			platform,
 			placement: 'bottom-start',
 			middleware: [
