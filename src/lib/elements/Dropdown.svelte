@@ -52,7 +52,7 @@
 		}
 
 		if(Array.isArray(allItems)) {
-			const it = allItems.find(it => itemValue(it) === item);
+			const it = allItems.find(it => getItemValue(it) === item);
 
 			if(it && it !== item) {
 				return itemLabel(it, allItems);
@@ -100,6 +100,10 @@
 			search = search.toLowerCase();
 			return items.filter(item => itemLabel(item, items).toLowerCase().indexOf(search) !== -1);
 		};
+	}
+
+	function getItemValue(item) {
+		return (item ? itemValue(item) : item);
 	}
 	
 	let visibleItems = [];
@@ -240,8 +244,8 @@
 	function deselectItem(item) {
 		if(!multiple || !Array.isArray(visibleSelected)) return;
 		
-		const value = itemValue(item);
-		const idx = visibleSelected.findIndex(it => itemValue(it) === value);
+		const value = getItemValue(item);
+		const idx = visibleSelected.findIndex(it => getItemValue(it) === value);
 
 		if(idx !== -1) {
 			visibleSelected.splice(idx, 1);
@@ -259,9 +263,9 @@
 	function selectedItem(item, visibleSelected) {
 		if(!Array.isArray(visibleSelected)) return false;
 		
-		let value = itemValue(item);
+		let value = getItemValue(item);
 
-		return visibleSelected.find(it => itemValue(it) === value);
+		return visibleSelected.find(it => getItemValue(it) === value);
 	}
 
 	async function createItem(newItem) {
@@ -284,7 +288,7 @@
 			if(multiple) {
 				dispatch('change', (visibleSelected || []).map(itemValue));
 			} else {
-				dispatch('change', visibleSelected ? itemValue(visibleSelected) : null);
+				dispatch('change', visibleSelected ? getItemValue(visibleSelected) : null);
 			}
 		} else {
 			dispatch('change', visibleSelected || (multiple ? [] : null));
@@ -330,7 +334,7 @@
 				<li 
 					data-index={i} 
 					class:target={i === targetIndex} 
-					class:current={!multiple && itemValue(item) == itemValue(visibleSelected)} 
+					class:current={!multiple && getItemValue(item) == getItemValue(visibleSelected)} 
 					class:highlighted={item?.highlighted} 
 					on:click={() => selectItem(item)}
 				>
