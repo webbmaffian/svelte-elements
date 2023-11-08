@@ -20,6 +20,7 @@
 	export let dropdownGap = 20;
 	export let createPrefix = 'Create';
 	export let dropdownPlaceholder = null;
+	export let clearOnFocus = true;
 
 	/**
 	 * Takes an item and returns its value.
@@ -79,7 +80,8 @@
 	let stopAutoUpdate;
 	let targetIndex = -1;
 	let visibleSelected = null;
-
+	let tempVisibleSelected;
+	
 	// Run every time `selected` changes
 	$: updateVisibleSelected(selected);
 
@@ -129,6 +131,11 @@
 	}
 
 	async function openDropdown() {
+		if(clearOnFocus) {
+			tempVisibleSelected = visibleSelected
+			visibleSelected = '';
+		}
+
 		open = true;
 		await tick();
 		stopAutoUpdate = autoUpdate(wrapper, dropdown, updatePosition);
@@ -136,6 +143,9 @@
 	}
 
 	function closeDropdown() {
+		if(clearOnFocus && !visibleSelected) {
+			visibleSelected = tempVisibleSelected;
+		}
 		open = false;
 		targetIndex = -1;
 
