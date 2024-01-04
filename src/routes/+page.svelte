@@ -44,6 +44,10 @@
 		];
 	};
 
+	let items4 = async (search) => {
+		return [];
+	};
+
 	let result;
 
 	function outputEventData(e) {
@@ -89,6 +93,18 @@
 	selected={['k60', 'k37']}
 	multiple
 	clearable
+	on:change={outputEventData}
+/>
+
+<h2>Dropdown 4</h2>
+<p>An async empty creatable array of strings.</p>
+<Dropdown
+	placeholder="Select something"
+	items={items4}
+	selected={null}
+	multiple
+	clearable
+	creatable
 	on:change={outputEventData}
 />
 
