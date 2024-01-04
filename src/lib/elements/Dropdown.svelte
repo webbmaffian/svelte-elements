@@ -111,7 +111,7 @@
 	let visibleItems = [];
 	$: filteredVisibleItems = visibleItems.filter(it => !selectedItem(it, visibleSelected));
 	$: dropdownActivatable = open && (filteredVisibleItems.length !== 0 || dropdownPlaceholder || creatable);
-	$: isCreatable = creatable && searchString !== '' && !items.find(item => item === searchString);
+	$: isCreatable = creatable && searchString !== '' ? typeof items === 'function' ? items().then(items => !items.find(item => item === searchString)) : !items.find(item => item === searchString) : false;
 
 	function updatePosition() {
 		if(!wrapper || !input || !dropdown) return;
@@ -280,6 +280,11 @@
 
 	async function createItem(newItem) {
 		if(typeof newItem !== "string" || newItem?.trim() === '') return;
+
+		if(typeof items === 'function') {
+			items = await items();
+		}
+
 		for(const item of items) {
 			if (typeof item !== "string") return;
 		}
