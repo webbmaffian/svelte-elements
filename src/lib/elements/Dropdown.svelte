@@ -1,14 +1,20 @@
 <script>
-	import { computePosition, platform, flip, autoUpdate, offset } from '@floating-ui/dom';
-    import { createEventDispatcher, tick } from 'svelte';
-	import { ChevronDown, X } from 'lucide-svelte';
+	import {
+		computePosition,
+		platform,
+		flip,
+		autoUpdate,
+		offset,
+	} from "@floating-ui/dom";
+	import { createEventDispatcher, tick } from "svelte";
+	import { ChevronDown, X } from "lucide-svelte";
 
 	const dispatch = createEventDispatcher();
-	const itemValueKeys = ['id', 'value'];
-	const itemLabelKeys = ['label', 'name', 'value'];
+	const itemValueKeys = ["id", "value"];
+	const itemLabelKeys = ["label", "name", "value"];
 
 	export let id = null;
-	export let placeholder = '';
+	export let placeholder = "";
 	export let items = [];
 	export let selected = null;
 	export let multiple = false;
@@ -16,20 +22,20 @@
 	export let creatable = false;
 	export let disabled = false;
 	export let required = false;
-	export let classes = '';
+	export let classes = "";
 	export let dropdownGap = 20;
-	export let createPrefix = 'Create';
+	export let createPrefix = "Create";
 	export let dropdownPlaceholder = null;
-	export let clearOnFocus = true;
+	export let clearOnFocus = !multiple;
 
 	/**
 	 * Takes an item and returns its value.
 	 * @param item
 	 */
 	export let itemValue = (item) => {
-		if(typeof item === 'object' && item !== null) {
-			for(const key of itemValueKeys) {
-				if(typeof item[key] !== 'undefined') {
+		if (typeof item === "object" && item !== null) {
+			for (const key of itemValueKeys) {
+				if (typeof item[key] !== "undefined") {
 					return item[key];
 				}
 			}
@@ -44,18 +50,18 @@
 	 * @param allItems
 	 */
 	export let itemLabel = (item, allItems = items) => {
-		if(typeof item === 'object') {
-			for(const key of itemLabelKeys) {
-				if(typeof item[key] !== 'undefined') {
+		if (typeof item === "object") {
+			for (const key of itemLabelKeys) {
+				if (typeof item[key] !== "undefined") {
 					return item[key];
 				}
 			}
 		}
 
-		if(Array.isArray(allItems)) {
-			const it = allItems.find(it => getItemValue(it) === item);
+		if (Array.isArray(allItems)) {
+			const it = allItems.find((it) => getItemValue(it) === item);
 
-			if(it && it !== item) {
+			if (it && it !== item) {
 				return itemLabel(it, allItems);
 			}
 		}
@@ -68,20 +74,20 @@
 	 * @param value
 	 */
 	export let resolveSelectedItems = (value) => {
-		return value
+		return value;
 	};
 
 	let wrapper;
 	let input;
 	let dropdown;
 	let open = false;
-	let style = '';
-	let searchString = '';
+	let style = "";
+	let searchString = "";
 	let stopAutoUpdate;
 	let targetIndex = -1;
 	let visibleSelected = null;
 	let tempVisibleSelected;
-	
+
 	// Run every time `selected` changes
 	$: updateVisibleSelected(selected);
 
@@ -89,51 +95,65 @@
 		visibleSelected = await resolveSelectedItems(selected);
 	}
 
-	$: getter = (typeof items === 'function' ? items : arrayGetter(items));
+	$: getter = typeof items === "function" ? items : arrayGetter(items);
 	$: hasValue = !!(multiple ? visibleSelected?.length : visibleSelected);
-	
+
 	/**
 	 * @param {Array} items
 	 */
 	function arrayGetter(items) {
 		return (search) => {
-			if(!search || !items) return items;
+			if (!search || !items) return items;
 
 			search = search.toLowerCase();
-			return items.filter(item => itemLabel(item, items).toLowerCase().indexOf(search) !== -1);
+			return items.filter(
+				(item) =>
+					itemLabel(item, items).toLowerCase().indexOf(search) !== -1,
+			);
 		};
 	}
 
 	function getItemValue(item) {
-		return (item ? itemValue(item) : item);
+		return item ? itemValue(item) : item;
 	}
-	
+
 	let visibleItems = [];
-	$: filteredVisibleItems = visibleItems.filter(it => !selectedItem(it, visibleSelected));
-	$: dropdownActivatable = open && (filteredVisibleItems.length !== 0 || dropdownPlaceholder || creatable);
-	$: isCreatable = creatable && searchString !== '' ? typeof items === 'function' ? items().then(items => !items.find(item => item === searchString)) : !items.find(item => item === searchString) : false;
+	$: filteredVisibleItems = visibleItems.filter(
+		(it) => !selectedItem(it, visibleSelected),
+	);
+	$: dropdownActivatable =
+		open &&
+		(filteredVisibleItems.length !== 0 || dropdownPlaceholder || creatable);
+	$: isCreatable =
+		creatable && searchString !== ""
+			? typeof items === "function"
+				? items().then(
+						(items) => !items.find((item) => item === searchString),
+					)
+				: !items.find((item) => item === searchString)
+			: false;
 
 	function updatePosition() {
-		if(!wrapper || !input || !dropdown) return;
+		if (!wrapper || !input || !dropdown) return;
 		computePosition(wrapper, dropdown, {
 			platform,
-			placement: 'bottom-start',
+			placement: "bottom-start",
 			middleware: [
 				offset(dropdownGap),
 				flip({
 					crossAxis: false,
-					padding: 16
-				})
-			]
-		}).then(({y}) => {
+					padding: 16,
+				}),
+			],
+		}).then(({ y }) => {
 			style = `top: ${y}px;`;
 		});
 	}
 
 	async function openDropdown() {
-		if(clearOnFocus) {
-			tempVisibleSelected = visibleSelected
-			visibleSelected = '';
+		if (clearOnFocus) {
+			tempVisibleSelected = visibleSelected;
+			visibleSelected = "";
 		}
 
 		open = true;
@@ -143,13 +163,13 @@
 	}
 
 	function closeDropdown() {
-		if(clearOnFocus && !visibleSelected) {
+		if (clearOnFocus && !visibleSelected) {
 			visibleSelected = tempVisibleSelected;
 		}
 		open = false;
 		targetIndex = -1;
 
-		if(stopAutoUpdate) {
+		if (stopAutoUpdate) {
 			stopAutoUpdate();
 			stopAutoUpdate = null;
 		}
@@ -163,34 +183,47 @@
 				break;
 			case 38:
 				e.preventDefault();
-				if(!open) openDropdown();
+				if (!open) openDropdown();
 				targetPrevItem();
-				if(dropdown?.children) dropdown.scrollTo(0, dropdown.children[targetIndex]?.offsetTop);
+				if (dropdown?.children)
+					dropdown.scrollTo(
+						0,
+						dropdown.children[targetIndex]?.offsetTop,
+					);
 				break;
 			case 40:
 				e.preventDefault();
-				if(!open) openDropdown();
+				if (!open) openDropdown();
 				targetNextItem();
-				if(dropdown?.children) dropdown.scrollTo(0, dropdown.children[targetIndex]?.offsetTop);
+				if (dropdown?.children)
+					dropdown.scrollTo(
+						0,
+						dropdown.children[targetIndex]?.offsetTop,
+					);
 				break;
 			case 13:
 				e.preventDefault();
-				if((targetIndex === -1 || targetIndex === filteredVisibleItems.length) && isCreatable) {
-					createItem(searchString)
+				if (
+					(targetIndex === -1 ||
+						targetIndex === filteredVisibleItems.length) &&
+					isCreatable
+				) {
+					createItem(searchString);
 				} else {
-					const selectedTargetItem = filteredVisibleItems[targetIndex];
-					
-					if(selectedTargetItem) {
+					const selectedTargetItem =
+						filteredVisibleItems[targetIndex];
+
+					if (selectedTargetItem) {
 						selectItem(selectedTargetItem);
-						
-						if(targetIndex >= filteredVisibleItems.length - 1) {
+
+						if (targetIndex >= filteredVisibleItems.length - 1) {
 							targetIndex = 0;
 						}
 					}
 				}
 				break;
 			case 8:
-				if(input.value === '' && Array.isArray(visibleSelected)) {
+				if (input.value === "" && Array.isArray(visibleSelected)) {
 					deselectItem(visibleSelected[visibleSelected.length - 1]);
 				}
 				break;
@@ -199,8 +232,8 @@
 		}
 	}
 	function targetPrevItem() {
-		if(targetIndex <= 0) {
-			if(isCreatable) {
+		if (targetIndex <= 0) {
+			if (isCreatable) {
 				return targetItem(filteredVisibleItems.length);
 			}
 
@@ -211,14 +244,13 @@
 	}
 
 	function targetNextItem() {
-		if(targetIndex === filteredVisibleItems.length - 1) {
-			if(isCreatable) {
+		if (targetIndex === filteredVisibleItems.length - 1) {
+			if (isCreatable) {
 				return targetItem(filteredVisibleItems.length);
 			}
-			
 		}
-		
-		if(targetIndex >= filteredVisibleItems.length - 1) {
+
+		if (targetIndex >= filteredVisibleItems.length - 1) {
 			return targetItem(0);
 		}
 
@@ -236,10 +268,10 @@
 	}
 
 	function selectItem(item) {
-		if(multiple) {
-			if(!Array.isArray(visibleSelected)) {
+		if (multiple) {
+			if (!Array.isArray(visibleSelected)) {
 				visibleSelected = [item];
-			} else if(!selectedItem(item, visibleSelected)) {
+			} else if (!selectedItem(item, visibleSelected)) {
 				visibleSelected.push(item);
 				visibleSelected = visibleSelected;
 			}
@@ -252,12 +284,14 @@
 	}
 
 	function deselectItem(item) {
-		if(!multiple || !Array.isArray(visibleSelected)) return;
-		
-		const value = getItemValue(item);
-		const idx = visibleSelected.findIndex(it => getItemValue(it) === value);
+		if (!multiple || !Array.isArray(visibleSelected)) return;
 
-		if(idx !== -1) {
+		const value = getItemValue(item);
+		const idx = visibleSelected.findIndex(
+			(it) => getItemValue(it) === value,
+		);
+
+		if (idx !== -1) {
 			visibleSelected.splice(idx, 1);
 			visibleSelected = visibleSelected;
 		}
@@ -266,57 +300,66 @@
 	}
 
 	function deselectAll() {
-		visibleSelected = (multiple ? [] : null);
+		visibleSelected = multiple ? [] : null;
 		dispatchChange();
 	}
 
 	function selectedItem(item, visibleSelected) {
-		if(!Array.isArray(visibleSelected)) return false;
-		
+		if (!Array.isArray(visibleSelected)) return false;
+
 		let value = getItemValue(item);
 
-		return visibleSelected.find(it => getItemValue(it) === value);
+		return visibleSelected.find((it) => getItemValue(it) === value);
 	}
 
 	async function createItem(newItem) {
-		if(typeof newItem !== "string" || newItem?.trim() === '') return;
+		if (typeof newItem !== "string" || newItem?.trim() === "") return;
 
-		if(typeof items === 'function') {
+		if (typeof items === "function") {
 			items = await items();
 		}
 
-		for(const item of items) {
+		for (const item of items) {
 			if (typeof item !== "string") return;
 		}
 
 		items.push(newItem);
 		items = items;
-		searchString = '';
-		input.value = '';
+		searchString = "";
+		input.value = "";
 		visibleItems = await getter();
 
 		selectItem(newItem);
 	}
 
 	function dispatchChange() {
-		if(Array.isArray(items)) {
-			if(multiple) {
-				dispatch('change', (visibleSelected || []).map(itemValue));
+		if (Array.isArray(items)) {
+			if (multiple) {
+				dispatch("change", (visibleSelected || []).map(itemValue));
 			} else {
-				dispatch('change', visibleSelected ? getItemValue(visibleSelected) : null);
+				dispatch(
+					"change",
+					visibleSelected ? getItemValue(visibleSelected) : null,
+				);
 			}
 		} else {
-			dispatch('change', visibleSelected || (multiple ? [] : null));
+			dispatch("change", visibleSelected || (multiple ? [] : null));
 		}
 	}
 </script>
 
-<article class={`svelte-elements-dropdown ${classes}`} bind:this={wrapper} class:disabled>
+<article
+	class={`svelte-elements-dropdown ${classes}`}
+	bind:this={wrapper}
+	class:disabled
+>
 	<label class="input">
 		{#if multiple && Array.isArray(visibleSelected)}
 			<ul class="selected" on:mousedown|preventDefault>
 				{#each visibleSelected as item}
-					<li on:click={() => deselectItem(item)}>{itemLabel(item, items)}<X size={16} /></li>
+					<li on:click={() => deselectItem(item)}>
+						{itemLabel(item, items)}<X size={16} />
+					</li>
 				{/each}
 			</ul>
 		{/if}
@@ -326,7 +369,9 @@
 			type="text"
 			autocomplete="off"
 			{placeholder}
-			value={!multiple && visibleSelected ? itemLabel(visibleSelected, items) : ''}
+			value={!multiple && visibleSelected
+				? itemLabel(visibleSelected, items)
+				: ""}
 			on:keydown={handleKeydown}
 			on:focus={openDropdown}
 			on:blur={closeDropdown}
@@ -337,20 +382,32 @@
 		/>
 
 		{#if clearable && hasValue}
-			<button tabindex="-1" on:click={deselectAll}><X size={16} /></button>
+			<button tabindex="-1" on:click={deselectAll}><X size={16} /></button
+			>
 		{:else}
 			<ChevronDown />
-		{/if}		
+		{/if}
 	</label>
 
 	{#if open}
-		<ul class="dropdown" class:open={dropdownActivatable} {style} bind:this={dropdown} on:mousedown|preventDefault on:mousemove={(e) => {if(e.target.tagName === 'LI') targetItem(parseInt(e.target.dataset.index, 10))}}>
+		<ul
+			class="dropdown"
+			class:open={dropdownActivatable}
+			{style}
+			bind:this={dropdown}
+			on:mousedown|preventDefault
+			on:mousemove={(e) => {
+				if (e.target.tagName === "LI")
+					targetItem(parseInt(e.target.dataset.index, 10));
+			}}
+		>
 			{#each filteredVisibleItems as item, i}
-				<li 
-					data-index={i} 
-					class:target={i === targetIndex} 
-					class:current={!multiple && getItemValue(item) == getItemValue(visibleSelected)} 
-					class:highlighted={item?.highlighted} 
+				<li
+					data-index={i}
+					class:target={i === targetIndex}
+					class:current={!multiple &&
+						getItemValue(item) == getItemValue(visibleSelected)}
+					class:highlighted={item?.highlighted}
 					on:click={() => selectItem(item)}
 				>
 					{itemLabel(item, items)}
@@ -358,7 +415,13 @@
 			{/each}
 
 			{#if isCreatable}
-				<li data-index={filteredVisibleItems.length} class:target={targetIndex === filteredVisibleItems.length} on:click={() => createItem(searchString)}>{`${createPrefix} "${searchString}"`}</li>
+				<li
+					data-index={filteredVisibleItems.length}
+					class:target={targetIndex === filteredVisibleItems.length}
+					on:click={() => createItem(searchString)}
+				>
+					{`${createPrefix} "${searchString}"`}
+				</li>
 			{:else if dropdownPlaceholder && filteredVisibleItems.length === 0}
 				<li class="dropdown-placeholder">{dropdownPlaceholder}</li>
 			{/if}
@@ -389,10 +452,13 @@
 		gap: 4px;
 		background: var(--dropdown-input-background, none);
 		border: var(--dropdow-input-border, none);
-		box-shadow: var(--dropdown-input-box-shadow, 0 1px 2px rgba(0, 0, 0, 0.04));
+		box-shadow: var(
+			--dropdown-input-box-shadow,
+			0 1px 2px rgba(0, 0, 0, 0.04)
+		);
 		padding: var(--dropdown-input-padding, 4px);
 		border-radius: var(--dropdown-input-border-radius, 8px);
-		outline: var(--dropdown-input-outline, 1px solid #D1D5DB);
+		outline: var(--dropdown-input-outline, 1px solid #d1d5db);
 		cursor: text;
 
 		&:focus-within {
@@ -431,12 +497,12 @@
 			gap: 4px;
 			padding: 4px;
 			border-radius: 4px;
-			background: var(--dropdown-badge-background, #E5E7EB);
+			background: var(--dropdown-badge-background, #e5e7eb);
 			white-space: nowrap;
 			cursor: pointer;
 		}
 	}
-	
+
 	.dropdown {
 		position: absolute;
 		left: 0;
@@ -444,7 +510,10 @@
 		max-height: var(--dropdow-max-height, 256px);
 		list-style-type: none;
 		background: #fff;
-		box-shadow: var(--dropdown-input-box-shadow, 0 1px 8px rgba(0, 0, 0, 0.08));
+		box-shadow: var(
+			--dropdown-input-box-shadow,
+			0 1px 8px rgba(0, 0, 0, 0.08)
+		);
 		border-radius: var(--dropdown-input-border-radius, 8px);
 		overflow-x: hidden;
 		overflow-y: auto;
@@ -459,7 +528,7 @@
 			}
 
 			&.current {
-				background-color: #E5E7EB;
+				background-color: #e5e7eb;
 			}
 
 			&.dropdown-placeholder {
