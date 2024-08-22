@@ -355,8 +355,10 @@
 >
 	<label class="input">
 		{#if multiple && Array.isArray(visibleSelected)}
+			<!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
 			<ul class="selected" on:mousedown|preventDefault>
 				{#each visibleSelected as item}
+					<!-- svelte-ignore a11y-click-events-have-key-events -->
 					<li on:click={() => deselectItem(item)}>
 						{itemLabel(item, items)}<X size={16} />
 					</li>
@@ -390,6 +392,7 @@
 	</label>
 
 	{#if open}
+		<!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
 		<ul
 			class="dropdown"
 			class:open={dropdownActivatable}
@@ -402,6 +405,7 @@
 			}}
 		>
 			{#each filteredVisibleItems as item, i}
+				<!-- svelte-ignore a11y-click-events-have-key-events -->
 				<li
 					data-index={i}
 					class:target={i === targetIndex}
@@ -415,6 +419,7 @@
 			{/each}
 
 			{#if isCreatable}
+				<!-- svelte-ignore a11y-click-events-have-key-events -->
 				<li
 					data-index={filteredVisibleItems.length}
 					class:target={targetIndex === filteredVisibleItems.length}
