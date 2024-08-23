@@ -38,6 +38,7 @@
 -->
 
 <script>
+  	import { ArrowDown } from "lucide-svelte";
 	import SortableHeadline from "./SortableHeadline.svelte";
 
 	/**
@@ -64,7 +65,7 @@
 	 * @typedef {Object} Column
 	 * @property {string} [name]
 	 * @property {string} label
-	 * @property {string} [sortable]
+	 * @property {boolean} [sortable]
 	 * @property {Formatter} [format]
 	 * @property {string} [element]
 	 * @property {Object} [component]
@@ -85,6 +86,7 @@
 	export let visibleColumns = Object.keys(columns);
 	export let rows = [];
 	export let identifier = null;
+	export let updateParam = true;
 	export let rowClass = () => '';
 
 	/** @type {ClickHandler} */
@@ -102,7 +104,7 @@
 			{#each headers as col}
 				<th class:ellipsis={col.ellipsis} class:component={col.component} class={`${col.align || ''} ${col.name}`}>
 					{#if col.sortable}
-						<SortableHeadline name={col.name} on:sort>
+						<SortableHeadline name={col.name} {updateParam} on:sort>
 							{col.label}
 						</SortableHeadline>
 					{:else}
@@ -160,11 +162,92 @@
 </table>
 
 <style lang="scss">
+	:root {
+		--wme-table-space: 1rem;
+		--wme-table-transition-duration: 150ms;
+		--wme-table-border-radius: 8px;
+		--wme-table-border-width: 0px;
+		--wme-table-box-shadow: 0 0 4px rgba(0, 0, 0, 0.05);
+		--wme-table-font-size: 0.875em;
+		--wme-table-leading-space: 0.5rem;
+		--wme-table-trailing-space: 0.5rem;
+		--wme-table-color-empty: #807D7D;
+		--wme-table-color-hover: #F2EEEB;
+		--wme-table-color-border: #F2EEEB;
+		--wme-table-color-text: #4D4B4B;
+		--wme-table-color-text-hover: #1A1919;
+		--wme-table-color-quantity: #807D7D;
+		--wme-table-color-sort: #633238;
+		--wme-table-color-head: transparent;
+		--wme-table-color-foot: transparent;
+		--wme-table-color-even: transparent;
+		--wme-table-color-odd: #FAF7F5;
+	}
+
+	table {
+		width: 100%;
+		border: none;
+		border-spacing: 0;
+		border-collapse: collapse;
+		font-size: var(--wme-table-font-size);
+		line-height: 1.7;
+
+		&.clickable {
+			tbody {
+				td {
+					transition: background-color var(--wme-table-transition-duration);
+					cursor: pointer;
+				}
+
+				tr {
+					&:hover {
+						td {
+							background-color: var(--wme-table-color-hover);
+						}
+					}
+				}
+			}
+		}
+	}
+
 	tbody {
 		td:empty {
 			&::before {
 				content: '-';
-				color: var(--wme-table-color-empty, #807D7D);
+				color: var(--wme-table-color-empty);
+			}
+		}
+
+		tr {
+			&:nth-child(odd) {
+				th,
+				td {
+					background-color: var(--wme-table-color-odd);
+				}
+			}
+
+			&:nth-child(even) {
+				th,
+				td {
+					background-color: var(--wme-table-color-even);
+				}
+			}
+
+			&:hover {
+				th,
+				td {
+					background-color: var(--wme-table-color-hover);
+				}
+			}
+
+			& > :first-child {
+				border-top-left-radius: var(--wme-table-border-radius);
+				border-bottom-left-radius: var(--wme-table-border-radius);
+			}
+
+			& > :last-child {
+				border-top-right-radius: var(--wme-table-border-radius);
+				border-bottom-right-radius: var(--wme-table-border-radius);
 			}
 		}
 	}
@@ -181,27 +264,85 @@
 		text-align: right;
 	}
 
+	.small {
+		width: calc(var(--wme-table-space) * 6);
+		max-width: none;
+	}
+
+	.input {
+		padding: 0;
+		border: 1px solid var(--wme-table-color-border);
+
+		label {
+			display: flex;
+			align-items: center;
+			text-indent: calc(var(--wme-table-space) * -0.5);
+			padding-right: calc(var(--wme-table-space) * 0.75);
+		}
+
+		input {
+			background-color: transparent;
+			outline: none;
+			text-align: inherit;
+			font-size: inherit;
+			line-height: inherit;
+			color: inherit;
+		}
+	}
+
 	th, td {
 		overflow: visible;
 		max-width: none;
+		padding: calc(var(--wme-table-space) * 0.75) calc(var(--wme-table-space) * 0.5);
+		white-space: nowrap;
 
 		&.ellipsis {
 			overflow: hidden;
 			max-width: 0;
 			text-overflow: ellipsis;
 		}
+
+		&:first-child {
+			padding-left: var(--wme-table-leading-space);
+		}
+
+		&:last-child {
+			padding-right: var(--wme-table-trailing-space);
+		}
+	}
+
+	th {
+		text-align: left;
+		font-size: 0.75em;
+		line-height: 1.3;
+		font-weight: bold;
+		text-transform: uppercase;
+		color: var(--wme-table-color-text);
+	}
+
+	td {
+		text-align: left;
+		border-bottom-width: var(--wme-table-border-width);
+		border-bottom-color: var(--wme-table-color-border);
+		border-bottom-style: solid;
+	}
+
+	thead {
+		background-color: var(--wme-table-color-head);
 	}
 
 	tfoot {
+		background-color: var(--wme-table-color-foot);
+
 		th, td {
-			padding-top: calc(var(--wme-table-space, 1rem) * 0.5);
-			padding-bottom: calc(var(--wme-table-space, 1rem) * 0.5);
+			padding-top: calc(var(--wme-table-space) * 0.5);
+			padding-bottom: calc(var(--wme-table-space) * 0.5);
 		}
 		
 		tr:first-child {
 			th, td {
-				padding-top: calc(var(--wme-table-space, 1rem) * 0.75);
-				border-top: 1px solid var(--wme-table-color-border, #F2EEEB);
+				padding-top: calc(var(--wme-table-space) * 0.75);
+				border-top: 1px solid var(--wme-table-color-border);
 			}
 		}
 
@@ -215,19 +356,13 @@
 		}
 	}
 
-	table.clickable {
-		tbody {
-			td {
-				transition: background-color var(--wme-table-transition-duration, 150ms);
-				cursor: pointer;
-			}
-
-			tr {
-				&:hover {
-					td {
-						background-color: var(--wme-table-color-hover, #F2EEEB);
-					}
-				}
+	tbody,
+	tfoot {
+		.quantity:not(:empty) {
+			&::after {
+				content: ' x';
+				white-space: pre;
+				color: var(--wme-table-color-quantity);
 			}
 		}
 	}
@@ -239,11 +374,11 @@
 
 		tr {
 			display: block;
-			border-radius: var(--wme-table-border-radius, 8px);
-			box-shadow: var(--wme-table-box-shadow, 0 0 4px rgba(0, 0, 0, 0.05));
+			border-radius: var(--wme-table-border-radius);
+			box-shadow: var(--wme-table-box-shadow);
 
 			& + tr {
-				margin-top: var(--wme-table-space, 1rem);
+				margin-top: var(--wme-table-space);
 			}
 		}
 
@@ -255,7 +390,7 @@
 		td {
 			display: flex;
 			width: 100%;
-			border-bottom: 1px solid var(--wme-table-color-border, #F2EEEB);
+			border-bottom: 1px solid var(--wme-table-color-border);
 			border-radius: 0;
 
 			&:empty {
@@ -264,19 +399,45 @@
 
 			&::before {
 				content: attr(aria-label);
-				color: var(--wme-table-color-label, #4D4B4B);
+				color: var(--wme-table-color-text);
 				margin-right: auto;
 			}
 
 			&:first-child {
-				border-top-left-radius: var(--wme-table-border-radius, 8px);
-				border-top-right-radius: var(--wme-table-border-radius, 8px);
+				border-top-left-radius: var(--wme-table-border-radius);
+				border-top-right-radius: var(--wme-table-border-radius);
 			}
 
 			&:last-child {
 				border-bottom: 0;
-				border-bottom-left-radius: var(--wme-table-border-radius, 8px);
-				border-bottom-right-radius: var(--wme-table-border-radius, 8px);
+				border-bottom-left-radius: var(--wme-table-border-radius);
+				border-bottom-right-radius: var(--wme-table-border-radius);
+			}
+		}
+	}
+
+	@media print {
+		table {
+			font-size: 0.625em;
+			line-height: 1.6;
+			table-layout: fixed;
+
+			th, td {
+				text-overflow: inherit;
+				font-size: inherit;
+				line-height: inherit;
+
+				&:first-child {
+					padding-left: 0;
+				}
+
+				&:last-child {
+					padding-right: 0;
+				}
+			}
+
+			tfoot {
+				display: table-row-group;
 			}
 		}
 	}

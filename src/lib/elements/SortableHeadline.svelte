@@ -1,6 +1,7 @@
 <script>
   	import { goto } from "$app/navigation";
 	import { page } from "$app/stores";
+  	import { ArrowDown } from "lucide-svelte";
 	import { createEventDispatcher } from "svelte";
 
 	export let name;
@@ -75,7 +76,7 @@
 <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
 <p class:active class:desc class={classes} on:click={updateSort}>
 	<slot />
-	<slot name="icon" />
+	<ArrowDown size="24" color="currentColor" />
 </p>
 
 <style lang="scss">
@@ -84,30 +85,28 @@
 		gap: calc(var(--wme-table-space) * 0.5);
 		align-items: center;
 		cursor: pointer;
-		transition: color 200ms;
+		transition: color calc(var(--wme-table-transition-duration) * 1.33);
 		white-space: nowrap;
 		text-overflow: ellipsis;
 		overflow: hidden;
-		font-weight: normal;
-		color: var(--wme-table-color-label);
+		color: var(--wme-table-color-text);
 
 		:global(svg) {
-
 			display: block;
 			width: 16px; 
 			height: 24px;
 			visibility: hidden;
 			opacity: 0;
-			transition: transform var(--wme-table-transition-duration, 150ms), opacity var(--wme-table-transition-duration, 150ms);
+			transition: transform var(--wme-table-transition-duration), opacity var(--wme-table-transition-duration);
 		}
 
 		&.active {
-			color: var(--wme-table-color-accent);
+			color: var(--wme-table-color-sort);
 
 			:global(svg) {
 				visibility: visible;
 				opacity: 1;
-				transition: transform var(--wme-table-transition-duration, 150ms), opacity var(--wme-table-transition-duration, 150ms);
+				transition: transform var(--wme-table-transition-duration), opacity var(--wme-table-transition-duration);
 			}
 		}
 
@@ -118,7 +117,7 @@
 		}
 
 		&:hover {
-			color: var(--wme-table-color-label-hover);
+			color: var(--wme-table-color-text-dark);
 		}
 	}
 </style>
