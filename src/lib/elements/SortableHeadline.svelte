@@ -117,7 +117,7 @@
 		}
 
 		&:hover {
-			color: var(--wme-table-color-text-dark);
+			color: var(--wme-table-color-text-hover);
 		}
 	}
 </style>
