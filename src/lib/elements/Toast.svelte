@@ -125,6 +125,10 @@
     });
 
     function updatePosition() {
+        if (!root || !wrapper) {
+            return;
+        }
+
         computePosition(root, wrapper, {
             placement: placement,
             middleware: [offset(offsetOptions), flip(), shift(shiftOptions)],
