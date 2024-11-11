@@ -37,7 +37,7 @@
                 if (autoHide) {
                     setTimeout(() => {
                         noticeStore.update((n) => {
-                            if (n.id === notice.id) {
+                            if (n?.id === notice.id) {
                                 return null;
                             }
 
