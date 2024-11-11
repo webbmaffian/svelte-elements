@@ -36,8 +36,12 @@
 
                 if (autoHide) {
                     setTimeout(() => {
-                        noticeStore.update(() => {
-                            return null;
+                        noticeStore.update((n) => {
+                            if (n.id === notice.id) {
+                                return null;
+                            }
+
+                            return n;
                         });
                     }, 5000);
                 }
@@ -156,16 +160,16 @@
         in:fly={inFly}
         out:fly={outFly}
     >
-        {#key $notice}
+        {#key $notice.id}
             <div class={`item ${$notice.type}`} in:fly={inFly}>
-                {#key icons.has($notice.type)}
+                {#if icons.has($notice.type)}
                     <span class="icon"
                         ><svelte:component
                             this={icons.get($notice.type)}
                             size="20"
                         /></span
                     >
-                {/key}
+                {/if}
                 <div class="content">
                     <span>{$notice.message}</span>
                 </div>
@@ -306,11 +310,11 @@
                 cursor: pointer;
                 border: none;
                 background-color: transparent;
-                color: hsl(0, 0%, 52.3%);
+                color: inherit;
 
                 &:focus,
                 &:hover {
-                    color: hsl(0, 0%, 9%);
+                    color: inherit;
                 }
 
                 :global(svg) {

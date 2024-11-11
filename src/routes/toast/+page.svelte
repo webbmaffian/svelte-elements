@@ -9,24 +9,24 @@
 <button
     bind:this={button}
     on:click={() => {
-        notice.setNotice("info test", { type: "info", autoHide: false });
+        notice.setNotice("info test", { type: "info", autoHide: true });
     }}>Click</button
 >
 
 <button
     on:click={() => {
-        notice.setNotice("success test", { type: "success", autoHide: false });
+        notice.setNotice("success test", { type: "success", autoHide: true });
     }}>Click</button
 >
 
 <button
     on:click={() => {
-        notice.setNotice("success test", { type: "warning", autoHide: false });
+        notice.setNotice("success test", { type: "warning", autoHide: true });
     }}>Click</button
 >
 
 <button
     on:click={() => {
-        notice.setNotice("success test", { type: "error", autoHide: false });
+        notice.setNotice("success test", { type: "error", autoHide: true });
     }}>Click</button
 >
