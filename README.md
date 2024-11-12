@@ -8,3 +8,4 @@ Install:
 ## Current elements
 - Dropdown
 - Table
+- Toast
