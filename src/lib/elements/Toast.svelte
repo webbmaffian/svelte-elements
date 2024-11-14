@@ -26,7 +26,9 @@
          * @param {Message} message
          * @param {{type: Type, autoHide: boolean}} params
          */
-        async setNotice(message, { type = "success", autoHide = true } = {}) {
+        async setNotice(message, args) {
+            args = { ...{ type: "success", autoHide: true }, ...args };
+
             noticeStore.update(() => {
                 const notice = {
                     id: crypto.randomUUID(),
