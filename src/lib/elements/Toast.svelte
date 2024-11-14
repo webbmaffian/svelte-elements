@@ -24,10 +24,13 @@
 
         /**
          * @param {Message} message
-         * @param {{type: Type, autoHide: boolean}} params
+         * @param {{type: Type, autoHide: boolean}} args
          */
         async setNotice(message, args) {
-            args = { ...{ type: "success", autoHide: true }, ...args };
+            const { type, autoHide } = {
+                ...{ type: "success", autoHide: true },
+                ...args,
+            };
 
             noticeStore.update(() => {
                 const notice = {
