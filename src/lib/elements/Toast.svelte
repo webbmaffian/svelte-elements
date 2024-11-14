@@ -15,6 +15,12 @@
      */
 
     /**
+     * @typedef {object} NoticeArgs
+     * @prop {Type} [type]
+     * @prop {boolean} [autoHide]
+     */
+
+    /**
      * @type {import('svelte/store').Writable<Notice>}
      */
     const noticeStore = writable(null);
@@ -24,7 +30,7 @@
 
         /**
          * @param {Message} message
-         * @param {{type: Type, autoHide: boolean}} args
+         * @param {NoticeArgs} [args]
          */
         async setNotice(message, args) {
             const { type, autoHide } = {
