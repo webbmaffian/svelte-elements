@@ -15,7 +15,7 @@
 
 	export let id = null;
 	export let placeholder = "";
-	/** @type {any[] | ((search: string) => any[])} */
+	/** @type {any[] | ((search: string) => Promise<any[]>)} */
 	export let items = [];
 	export let selected = null;
 	export let multiple = false;
