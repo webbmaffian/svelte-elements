@@ -94,7 +94,7 @@
     import { fly } from "svelte/transition";
 
     export let label = "Notification";
-    /** @type {'top-left'|'top-center|'top-right'|'bottom-left'|'bottom-center'|'bottom-right'} */
+    /** @type {'top-left'|'top-center'|'top-right'|'bottom-left'|'bottom-center'|'bottom-right'} */
     export let position = "top-right";
     /** @type {HTMLElement|null} */
     export let root;
