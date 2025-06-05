@@ -405,7 +405,8 @@
 >
 	<label
 		for={id}
-		class="group flex h-full cursor-text flex-wrap items-center gap-1 rounded-sm bg-[var(--wme-dropdown-input-background-color)] p-1 outline-[] outline-[var(--wme-dropdown-input-outline-color)] focus-within:outline-gray-700"
+		class="group outline-[] flex h-full w-full cursor-text flex-wrap items-center gap-1 rounded-sm bg-[var(--wme-dropdown-input-background-color)] p-1 [word-break:break-all] break-all outline-[var(--wme-dropdown-input-outline-color)] focus-within:outline-gray-700"
+		style="word-break: break-all;"
 	>
 		{#if multiple && Array.isArray(selectedItem)}
 			<ul class="contents">
@@ -413,7 +414,7 @@
 					<li class="contents">
 						<button
 							onclick={() => deselectArrayItem(item)}
-							class="flex cursor-pointer items-center gap-1 whitespace-nowrap rounded-sm bg-gray-300 px-1 py-0.5 text-sm"
+							class="flex cursor-pointer items-center gap-1 rounded-sm bg-gray-300 px-1 py-0.5 text-sm whitespace-nowrap"
 						>
 							{@render itemSnippet(item)}
 							<X size="16" />
@@ -438,13 +439,13 @@
 				{required}
 				{disabled}
 				class={[
-					'col-span-full row-span-full border-none bg-transparent leading-[inherit] text-inherit outline-none [font-family:inherit] [font-size:inherit] [font-weight:inherit] placeholder:select-none',
+					'col-span-full row-span-full border-none bg-transparent [font-family:inherit] [font-size:inherit] leading-[inherit] [font-weight:inherit] text-inherit outline-none placeholder:select-none',
 					selectedItem && !Array.isArray(selectedItem) && 'sr-only'
 				]}
 			/>
 			{#if selectedItem && !Array.isArray(selectedItem)}
 				<span
-					class="col-span-full row-span-full border-none bg-transparent leading-[inherit] text-inherit outline-none [font-family:inherit] [font-size:inherit] [font-weight:inherit] placeholder:select-none"
+					class="col-span-full row-span-full border-none bg-transparent [font-family:inherit] [font-size:inherit] leading-[inherit] [font-weight:inherit] text-inherit outline-none placeholder:select-none"
 				>
 					{@render itemSnippet(selectedItem)}
 				</span>
@@ -466,9 +467,10 @@
 		<ul
 			bind:this={dropdownElement}
 			class={[
-				'dropdown absolute left-0 right-0 top-0 z-10 max-h-64 overflow-y-auto overflow-x-hidden rounded-sm bg-white ring-1',
+				'dropdown absolute top-0 right-0 left-0 z-10 max-h-64 overflow-x-hidden overflow-y-auto rounded-sm bg-white break-all ring-1',
 				dropdownClass
 			]}
+			style="word-break: break-all;"
 			onmousedown={(e) => {
 				/** @type {HTMLElement?} */
 				const li = /** @type {HTMLElement} */ (e.target)?.closest('li[data-index]');

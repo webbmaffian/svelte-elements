@@ -38,7 +38,6 @@
 -->
 
 <script>
-	import { ArrowDown } from 'lucide-svelte';
 	import SortableHeadline from './SortableHeadline.svelte';
 
 	/**
@@ -92,7 +91,6 @@
 	export let identifier = 'id';
 	export let updateParam = true;
 	export let rowClass = () => '';
-	export let selected = '';
 
 	/** @type {ClickHandler} */
 	export let click = null;

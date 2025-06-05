@@ -1,8 +1,8 @@
 <script>
-  	import { goto } from "$app/navigation";
-	import { page } from "$app/stores";
-  	import { ArrowDown } from "lucide-svelte";
-	import { createEventDispatcher } from "svelte";
+	import { goto } from '$app/navigation';
+	import { page } from '$app/stores';
+	import { ArrowDown } from '@lucide/svelte';
+	import { createEventDispatcher } from 'svelte';
 
 	export let name;
 	export let updateParam = true;
@@ -13,8 +13,8 @@
 	const orders = ['asc', 'desc'];
 	const dispatch = createEventDispatcher();
 
-	$: active = ((currentOrderBy || $page.url.searchParams.get('sort')) === name);
-	$: desc = (!active || ($page.url.searchParams.get('order') || currentOrder) === 'desc');
+	$: active = (currentOrderBy || $page.url.searchParams.get('sort')) === name;
+	$: desc = !active || ($page.url.searchParams.get('order') || currentOrder) === 'desc';
 
 	function updateSort() {
 		const newState = {
@@ -23,8 +23,8 @@
 		};
 
 		dispatch('sort', newState);
-		
-		if(updateParam) {
+
+		if (updateParam) {
 			updateQueryParam($page, newState);
 		}
 	}
@@ -37,33 +37,30 @@
 	function updateQueryParam(page, key, val) {
 		const searchParams = new URLSearchParams(page.url.search);
 
-		if(typeof key === 'object') {
-			for(const k in key) {
-				const v = (Array.isArray(key[k]) ? key[k].join(',') : key[k]);
+		if (typeof key === 'object') {
+			for (const k in key) {
+				const v = Array.isArray(key[k]) ? key[k].join(',') : key[k];
 
-				if((Array.isArray(v) && v.length) || v) {
+				if ((Array.isArray(v) && v.length) || v) {
 					searchParams.set(k, v);
-				}
-				else {
+				} else {
 					searchParams.delete(k);
 				}
 			}
-		}
-		else {
-			if(Array.isArray(val)) {
+		} else {
+			if (Array.isArray(val)) {
 				val = val.join(',');
 			}
 
-			if(val instanceof Time) {
+			if (val instanceof Time) {
 				val = val.toString();
 			}
 
 			val = '' + val;
 
-			if(val.length) {
+			if (val.length) {
 				searchParams.set(key, val);
-			}
-			else {
+			} else {
 				searchParams.delete(key);
 			}
 		}
@@ -93,11 +90,13 @@
 
 		:global(svg) {
 			display: block;
-			width: 16px; 
+			width: 16px;
 			height: 24px;
 			visibility: hidden;
 			opacity: 0;
-			transition: transform var(--wme-table-transition-duration), opacity var(--wme-table-transition-duration);
+			transition:
+				transform var(--wme-table-transition-duration),
+				opacity var(--wme-table-transition-duration);
 		}
 
 		&.active {
@@ -106,7 +105,9 @@
 			:global(svg) {
 				visibility: visible;
 				opacity: 1;
-				transition: transform var(--wme-table-transition-duration), opacity var(--wme-table-transition-duration);
+				transition:
+					transform var(--wme-table-transition-duration),
+					opacity var(--wme-table-transition-duration);
 			}
 		}
 
