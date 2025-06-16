@@ -526,7 +526,7 @@
 					{createPrefix} "{search}"
 				</li>
 			{:else if emptyLabel && nonSelectedItems.length === 0}
-				<li class="cursor-default">{emptyLabel}</li>
+				<li class="empty cursor-default">{emptyLabel}</li>
 			{/if}
 		</ul>
 	{/if}
