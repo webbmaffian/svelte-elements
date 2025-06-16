@@ -196,6 +196,10 @@
 			selectedItem = multiple ? [] : null;
 		}
 
+		updateDropdown();
+	}
+
+	async function updateDropdown() {
 		items = await getter(search);
 
 		open = canOpen && true;
@@ -385,7 +389,7 @@
 	/** @type {import('svelte/elements').FormEventHandler<HTMLInputElement>} */
 	async function onsearch(e) {
 		search = e.currentTarget.value.trim();
-		openDropdown();
+		updateDropdown();
 	}
 
 	// dropdownElement
