@@ -403,7 +403,7 @@
 	bind:this={wrapperElement}
 	class={[
 		'svelte-elements-select relative',
-		disabled && 'pointer-events-none opacity-60',
+		disabled && 'disabled pointer-events-none opacity-60',
 		className
 	]}
 >
