@@ -77,6 +77,7 @@
      * itemSnippet?: import('svelte').Snippet<any>;
      * resolveSelectedItems?: resolveSelectedItems;
      * onchange: (item: any[] | any) => void;
+	 * options?: { offset: import('@floating-ui/dom').OffsetOptions, flip: import('@floating-ui/dom').FlipOptions };
     }} */
 	let {
 		id,
@@ -97,7 +98,14 @@
 		itemLabel = (item) => getItemLabel(item, items, itemValue),
 		itemSnippet = snippet,
 		resolveSelectedItems = getResolveSelectedItems,
-		onchange
+		onchange,
+		options = {
+			offset: 8,
+			flip: {
+				crossAxis: false,
+				padding: 16
+			}
+		}
 	} = $props();
 
 	/** @type {resolveSelectedItems} */
@@ -177,10 +185,10 @@
 			platform,
 			placement: 'bottom-start',
 			middleware: [
-				offset(20),
+				offset(options.offset),
 				flip({
-					crossAxis: false,
-					padding: 16
+					crossAxis: options.flip.crossAxis,
+					padding: options.flip.padding
 				})
 			]
 		}).then(({ y }) => {
@@ -224,6 +232,7 @@
 		}
 		open = false;
 		targetIndex = -1;
+		search = '';
 
 		if (stopAutoUpdatePosition) {
 			stopAutoUpdatePosition();
