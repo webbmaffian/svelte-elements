@@ -84,38 +84,57 @@
 	 * @property {Record<string, string>} columns
 	 */
 
-	/** @type {Record<string, Column>} */
-	export let columns = {};
-	export let visibleColumns = Object.keys(columns);
-	export let rows = [];
-	export let identifier = 'id';
-	export let updateParam = true;
-	export let rowClass = () => '';
+	/** @type {{
+	 * columns: Record<string, Column<any>>;
+	 * visibleColumns?: string[];
+	 * rows: any[];
+	 * identifier?: string;
+	 * updateParam?: boolean;
+	 * rowClass?: () => void;
+	 * click?: ClickHandler;
+	 * footerRows?: FooterRow[];
+	 * onsort: (state: {name: string, sort: 'asc' | 'desc'}) => void;
+	 * isLoading?: boolean;
+	 * loadingSnippet?: import('svelte').Snippet;
+	}} */
+	let {
+		columns,
+		visibleColumns = Object.keys(columns),
+		rows = [],
+		identifier = 'id',
+		updateParam = true,
+		rowClass = () => '',
+		click = undefined,
+		footerRows = [],
+		onsort,
+		isLoading = false,
+		loadingSnippet
+	} = $props();
 
-	/** @type {ClickHandler} */
-	export let click = null;
-
-	/** @type {FooterRow[]} */
-	export let footerRows = [];
-
-	$: headers = visibleColumns.map((name) => ({ name, ...columns[name] })).filter((v) => !!v);
+	/** @type {Column<any>[]} */
+	const headers = $derived(
+		visibleColumns.map((name) => ({ name, ...columns[name] })).filter((v) => !!v)
+	);
 </script>
 
-<table class:clickable={click}>
+<table class={[click && 'clickable']}>
 	<thead>
 		<tr>
 			{#each headers as col}
 				<th
-					class:ellipsis={col.ellipsis}
-					class:component={col.component}
-					class={`${col.align || ''} ${col.name}`}
+					class={[
+						col.align ?? '',
+						col.name,
+						col.ellipsis && 'ellipsis',
+						col.component && 'component'
+					]}
 				>
 					{#if col.sortable}
-						<SortableHeadline name={col.name} {updateParam} on:sort>
+						<SortableHeadline name={col.name} {updateParam} on:sort={onsort}>
 							{col.label}
 						</SortableHeadline>
 					{:else if col.hComponent}
-						<svelte:component this={col.hComponent} {...col.hProps ? col.hProps() : {}} />
+						<col.hComponent {...col.hProps ? col.hProps() : {}} />
 					{:else}
 						{col.label}
 					{/if}
@@ -124,17 +143,23 @@
 		</tr>
 	</thead>
 	<tbody>
+		{#if loadingSnippet && isLoading}
+			{@render loadingSnippet()}
+		{/if}
 		{#each rows as row, i (row[identifier] || i)}
-			<tr on:click={(e) => click && click(e, row)} class={rowClass(row)} data-id={row[identifier]}>
+			<tr onclick={(e) => click && click(e, row)} class={[rowClass(row)]} data-id={row[identifier]}>
 				{#each headers as col}
 					<td
-						class={`${col.align || ''} ${col.name}`}
-						class:ellipsis={col.ellipsis}
-						class:component={col.component}
 						aria-label={col.label || col.name}
+						class={[
+							col.align ?? '',
+							col.name,
+							col.ellipsis && 'ellipsis',
+							col.component && 'component'
+						]}
 					>
 						{#if col.component}
-							<svelte:component this={col.component} {...col.props ? col.props(row) : {}} />
+							<col.component {...col.props ? col.props(row) : {}} />
 						{:else if col.element}
 							{@const val = col.format ? col.format(row[col.name], row, col.name) : row[col.name]}
 
