@@ -418,8 +418,7 @@
 >
 	<label
 		for={id}
-		class="group outline-[] flex h-full w-full cursor-text flex-wrap items-center gap-1 rounded-sm bg-[var(--wme-dropdown-input-background-color)] p-1 [word-break:break-all] break-all outline-[var(--wme-dropdown-input-outline-color)] focus-within:outline-gray-700"
-		style="word-break: break-all;"
+		class="group outline-[] flex h-full w-full cursor-text flex-wrap items-center gap-1 rounded-sm bg-[var(--wme-dropdown-input-background-color)] p-1 outline-[var(--wme-dropdown-input-outline-color)] focus-within:outline-gray-700"
 	>
 		{#if multiple && Array.isArray(selectedItem)}
 			<ul class="contents">
