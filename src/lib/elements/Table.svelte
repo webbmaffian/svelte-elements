@@ -144,37 +144,46 @@
 	</thead>
 	<tbody>
 		{#if loadingSnippet && isLoading}
-			{@render loadingSnippet()}
-		{/if}
-		{#each rows as row, i (row[identifier] || i)}
-			<tr onclick={(e) => click && click(e, row)} class={[rowClass(row)]} data-id={row[identifier]}>
-				{#each headers as col}
-					<td
-						aria-label={col.label || col.name}
-						class={[
-							col.align ?? '',
-							col.name,
-							col.ellipsis && 'ellipsis',
-							col.component && 'component'
-						]}
-					>
-						{#if col.component}
-							<col.component {...col.props ? col.props(row) : {}} />
-						{:else if col.element}
-							{@const val = col.format ? col.format(row[col.name], row, col.name) : row[col.name]}
-
-							{#if val}
-								<svelte:element this={col.element} {...col.props ? col.props(row) : {}}>
-									{val}
-								</svelte:element>
-							{/if}
-						{:else}
-							{col.format ? col.format(row[col.name], row, col.name) : row[col.name]}
-						{/if}
-					</td>
-				{/each}
+			<tr class="contents">
+				<td class="contents">
+					{@render loadingSnippet()}
+				</td>
 			</tr>
-		{/each}
+		{:else}
+			{#each rows as row, i (row[identifier] || i)}
+				<tr
+					onclick={(e) => click && click(e, row)}
+					class={[rowClass(row)]}
+					data-id={row[identifier]}
+				>
+					{#each headers as col}
+						<td
+							aria-label={col.label || col.name}
+							class={[
+								col.align ?? '',
+								col.name,
+								col.ellipsis && 'ellipsis',
+								col.component && 'component'
+							]}
+						>
+							{#if col.component}
+								<col.component {...col.props ? col.props(row) : {}} />
+							{:else if col.element}
+								{@const val = col.format ? col.format(row[col.name], row, col.name) : row[col.name]}
+
+								{#if val}
+									<svelte:element this={col.element} {...col.props ? col.props(row) : {}}>
+										{val}
+									</svelte:element>
+								{/if}
+							{:else}
+								{col.format ? col.format(row[col.name], row, col.name) : row[col.name]}
+							{/if}
+						</td>
+					{/each}
+				</tr>
+			{/each}
+		{/if}
 	</tbody>
 
 	{#if footerRows?.length}
