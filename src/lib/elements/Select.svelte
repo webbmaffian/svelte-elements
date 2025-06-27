@@ -515,7 +515,7 @@
 					data-index={i}
 					class={[
 						'cursor-pointer p-2',
-						i === targetIndex && 'bg-gray-300',
+						i === targetIndex && 'current',
 						!multiple &&
 							selectedItem &&
 							itemValue(item) === itemValue(selectedItem) &&
@@ -529,7 +529,7 @@
 			{#if isCreateable}
 				<li
 					data-index={nonSelectedItems.length}
-					class={['', targetIndex === nonSelectedItems.length && 'bg-gray-300']}
+					class={['', targetIndex === nonSelectedItems.length && 'current']}
 				>
 					{createPrefix} "{search}"
 				</li>
@@ -553,5 +553,11 @@
 		--wme-dropdow-max-height: 16rem;
 		--wme-dropdown-input-box-shadow: 0 1px 8px rgba(0, 0, 0, 0.08);
 		--wme-dropdown-input-border-radius: 0.5rem;
+	}
+
+	article {
+		.current {
+			@apply bg-gray-300;
+		}
 	}
 </style>
