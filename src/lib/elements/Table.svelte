@@ -153,7 +153,7 @@
 			{#each rows as row, i (row[identifier] || i)}
 				<tr
 					onclick={(e) => click && click(e, row)}
-					class={[rowClass(row)]}
+					class={$derived(() => rowClass(row))}
 					data-id={row[identifier]}
 				>
 					{#each headers as col}
