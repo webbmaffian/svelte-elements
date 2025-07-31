@@ -541,6 +541,8 @@
 </article>
 
 <style>
+	@reference 'tailwindcss';
+
 	:root {
 		--wme-dropdown-input-background-color: transparent;
 		--wme-dropdow-input-border: none;
