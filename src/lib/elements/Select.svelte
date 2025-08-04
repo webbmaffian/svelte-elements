@@ -78,6 +78,7 @@
      * resolveSelectedItems?: resolveSelectedItems;
      * onchange: (item: any[] | any) => void;
 	 * options?: { offset: import('@floating-ui/dom').OffsetOptions, flip: import('@floating-ui/dom').FlipOptions };
+	 * createItem?: (label: string) => any;
     }} */
 	let {
 		id,
@@ -105,8 +106,13 @@
 				crossAxis: false,
 				padding: 16
 			}
-		}
+		},
+		createItem: getCreatedItem
 	} = $props();
+
+	if (createable && !getCreatedItem) {
+		throw Error('createItem is necessary for createable select');
+	}
 
 	/** @type {resolveSelectedItems} */
 	function getResolveSelectedItems(value) {
@@ -159,23 +165,15 @@
 	let targetIndex = $state(-1);
 
 	const getter = $derived(Array.isArray(rawItems) ? arrayGetter(rawItems, itemLabel) : rawItems);
-	// const isCreateable = fetch(async () => {
-	// 	if (!createable || search.trim() === '') {
-	// 		return false;
-	// 	}
 
-	// 	const items = await getter(search);
+	const isCreateable = $derived.by(() => {
+		const s = search.trim();
 
-	// 	return !items.find((item) => item === search);
-	// }, false);
-	/** @type {boolean} */
-	let isCreateable = $state(false);
-	$effect(() => {
-		if (!createable || search.trim() === '') {
-			isCreateable = false;
-		} else {
-			getter(search).then((items) => (isCreateable = !items.find((item) => item === search)));
+		if (!createable || s === '') {
+			return false;
 		}
+
+		return !items.find((item) => itemLabel(item) === search);
 	});
 	const canOpen = $derived(nonSelectedItems.length > 0 || !!emptyLabel || isCreateable);
 
@@ -240,18 +238,17 @@
 		}
 	}
 
-	/** @param {any} newItem  */
-	async function createItem(newItem) {
-		if (typeof newItem !== 'string' || newItem?.trim() === '') return;
+	/** @param {any} search  */
+	function createItem(search) {
+		const newItem = getCreatedItem?.(search);
 
-		for (const item of items) {
-			if (typeof item !== 'string') return;
+		if (!newItem) {
+			return;
 		}
 
 		items.push(newItem);
 		search = '';
 		inputElement.value = '';
-		// items = await getter();
 
 		selectItem(newItem);
 	}
